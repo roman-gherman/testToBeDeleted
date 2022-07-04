@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,11 +12,8 @@ using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Services.Catalog;
 using Nop.Services.Configuration;
-using Nop.Services.Logging;
 using Nop.Services.Seo;
 using SkiaSharp;
-using Svg;
-using Svg.Skia;
 
 namespace Nop.Services.Media
 {
@@ -30,7 +26,6 @@ namespace Nop.Services.Media
 
         private readonly IDownloadService _downloadService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILogger _logger;
         private readonly INopFileProvider _fileProvider;
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly IRepository<Picture> _pictureRepository;
@@ -47,7 +42,6 @@ namespace Nop.Services.Media
 
         public PictureService(IDownloadService downloadService,
             IHttpContextAccessor httpContextAccessor,
-            ILogger logger,
             INopFileProvider fileProvider,
             IProductAttributeParser productAttributeParser,
             IRepository<Picture> pictureRepository,
@@ -60,7 +54,6 @@ namespace Nop.Services.Media
         {
             _downloadService = downloadService;
             _httpContextAccessor = httpContextAccessor;
-            _logger = logger;
             _fileProvider = fileProvider;
             _productAttributeParser = productAttributeParser;
             _pictureRepository = pictureRepository;
@@ -437,9 +430,6 @@ namespace Nop.Services.Media
                 case "x-icon":
                     lastPart = "ico";
                     break;
-                case "svg+xml":
-                    lastPart = "svg";
-                    break;
                 default:
                     break;
             }
@@ -487,10 +477,6 @@ namespace Nop.Services.Media
             PictureType defaultPictureType = PictureType.Entity,
             string storeLocation = null)
         {
-            //get overridden default image if exists
-            if (defaultPictureType == PictureType.Entity && _mediaSettings.ProductDefaultImageId > 0)
-                return await GetPictureUrlAsync(_mediaSettings.ProductDefaultImageId, targetSize, false, storeLocation, PictureType.Entity);
-
             var defaultImageFileName = defaultPictureType switch
             {
                 PictureType.Avatar => await _settingService.GetSettingByKeyAsync("Media.Customer.DefaultAvatarImageName", NopMediaDefaults.DefaultAvatarFileName),
@@ -652,22 +638,9 @@ namespace Nop.Services.Media
                     {
                         try
                         {
-                            if (picture.MimeType == MimeTypes.ImageSvg)
-                            {
-                                using var memStream = new MemoryStream(pictureBinary);
-                                var svgDocument = SvgDocument.Open<SvgDocument>(memStream);
-                                svgDocument.Height = targetSize;
-                                svgDocument.Width = targetSize;
-                                using var stream = new MemoryStream();
-                                svgDocument.Write(stream);
-                                pictureBinary = stream.ToArray();
-                            }
-                            else
-                            {
-                                using var image = SKBitmap.Decode(pictureBinary);
-                                var format = GetImageFormatByMimeType(picture.MimeType);
-                                pictureBinary = ImageResize(image, format, targetSize);
-                            }
+                            using var image = SKBitmap.Decode(pictureBinary);
+                            var format = GetImageFormatByMimeType(picture.MimeType);
+                            pictureBinary = ImageResize(image, format, targetSize);
                         }
                         catch
                         {
@@ -702,46 +675,6 @@ namespace Nop.Services.Media
                 return string.Empty;
 
             return await GetThumbLocalPathAsync(_fileProvider.GetFileName(url));
-        }
-
-        #endregion
-
-        #region Convertation methods
-
-        /// <summary>
-        /// Convert image from SVG format to PNG
-        /// </summary>
-        /// <param name="filePath">SVG file path</param>
-        /// <returns>A task that represents the asynchronous operation
-        /// The task result contains the byte array</returns>
-        public virtual Task<byte[]> ConvertSvgToPngAsync(string filePath)
-        {
-            try
-            {
-                using var svg = new SKSvg();
-                svg.Load(filePath);
-
-                using var bitmap = new SKBitmap((int)svg.Picture.CullRect.Width, (int)svg.Picture.CullRect.Height);
-                var canvas = new SKCanvas(bitmap);
-                canvas.DrawPicture(svg.Picture);
-                canvas.Flush();
-                canvas.Save();
-
-                using var image = SKImage.FromBitmap(bitmap);
-                using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-
-                // save the data to a stream
-                using var memStream = new MemoryStream();
-                data.SaveTo(memStream);
-                memStream.Seek(0, SeekOrigin.Begin);
-
-                return Task.FromResult(memStream.ToArray());
-            }
-            catch
-            {
-            }
-
-            return null;
         }
 
         #endregion
@@ -856,7 +789,7 @@ namespace Nop.Services.Media
             seoFilename = CommonHelper.EnsureMaximumLength(seoFilename, 100);
 
             if (validateBinary)
-                pictureBinary = await ValidatePictureAsync(pictureBinary, mimeType, seoFilename);
+                pictureBinary = await ValidatePictureAsync(pictureBinary, mimeType);
 
             var picture = new Picture
             {
@@ -900,8 +833,7 @@ namespace Nop.Services.Media
                 ".pjp",
                 ".png",
                 ".tiff",
-                ".tif",
-                ".svg"
+                ".tif"
             } as IReadOnlyCollection<string>;
 
             var fileName = formFile.FileName;
@@ -923,7 +855,7 @@ namespace Nop.Services.Media
             //contentType is not always available 
             //that's why we manually update it here
             //http://www.sfsu.edu/training/mimetype.htm
-            if (string.IsNullOrEmpty(contentType) || contentType == MimeTypes.ImageSvg)
+            if (string.IsNullOrEmpty(contentType))
             {
                 switch (fileExtension)
                 {
@@ -946,9 +878,6 @@ namespace Nop.Services.Media
                         break;
                     case ".png":
                         contentType = MimeTypes.ImagePng;
-                        break;
-                    case ".svg":
-                        contentType = MimeTypes.ImageSvg;
                         break;
                     case ".tiff":
                     case ".tif":
@@ -995,7 +924,7 @@ namespace Nop.Services.Media
             seoFilename = CommonHelper.EnsureMaximumLength(seoFilename, 100);
 
             if (validateBinary)
-                pictureBinary = await ValidatePictureAsync(pictureBinary, mimeType, seoFilename);
+                pictureBinary = await ValidatePictureAsync(pictureBinary, mimeType);
 
             var picture = await GetPictureByIdAsync(pictureId);
             if (picture == null)
@@ -1100,12 +1029,11 @@ namespace Nop.Services.Media
         /// </summary>
         /// <param name="pictureBinary">Picture binary</param>
         /// <param name="mimeType">MIME type</param>
-        /// <param name="fileName">Name of file</param>
         /// <returns>
         /// A task that represents the asynchronous operation
         /// The task result contains the picture binary or throws an exception
         /// </returns>
-        public virtual async Task<byte[]> ValidatePictureAsync(byte[] pictureBinary, string mimeType, string fileName)
+        public virtual Task<byte[]> ValidatePictureAsync(byte[] pictureBinary, string mimeType)
         {
             try
             {
@@ -1117,12 +1045,11 @@ namespace Nop.Services.Media
                     var format = GetImageFormatByMimeType(mimeType);
                     pictureBinary = ImageResize(image, format, _mediaSettings.MaximumImageSize);
                 }
-                return pictureBinary;
+                return Task.FromResult(pictureBinary);
             }
-            catch (Exception exc)
+            catch
             {
-                await _logger.ErrorAsync($"Cannot decode picture binary (file name: {fileName})", exc);
-                return pictureBinary;
+                return Task.FromResult(pictureBinary);
             }
         }
 

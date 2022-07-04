@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -30,7 +29,6 @@ using Nop.Services.Logging;
 using Nop.Services.Media.RoxyFileman;
 using Nop.Services.Plugins;
 using Nop.Services.ScheduleTasks;
-using Nop.Services.Security;
 using Nop.Web.Framework.Globalization;
 using Nop.Web.Framework.Mvc.Routing;
 using WebMarkupMin.AspNetCore6;
@@ -299,17 +297,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
             {
                 FileProvider = new PhysicalFileProvider(fileProvider.GetAbsolutePath(NopCommonDefaults.DbBackupsPath)),
                 RequestPath = new PathString("/db_backups"),
-                ContentTypeProvider = provider,
-                OnPrepareResponse = context =>
-                {
-                    if (!DataSettingsManager.IsDatabaseInstalled() ||
-                        !EngineContext.Current.Resolve<IPermissionService>().AuthorizeAsync(StandardPermissionProvider.ManageMaintenance).Result)
-                    {
-                        context.Context.Response.StatusCode = StatusCodes.Status404NotFound;
-                        context.Context.Response.ContentLength = 0;
-                        context.Context.Response.Body = Stream.Null;
-                    }
-                }
+                ContentTypeProvider = provider
             });
 
             //add support for webmanifest files

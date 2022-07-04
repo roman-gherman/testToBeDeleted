@@ -136,10 +136,6 @@ namespace Nop.Web.Areas.Admin.Models.Settings
         public bool AllowAdminsToBuyCallForPriceProducts { get; set; }
         public bool AllowAdminsToBuyCallForPriceProducts_OverrideForStore { get; set; }
 
-        [NopResourceDisplayName("Admin.Configuration.Settings.Order.ShowProductThumbnailInOrderDetailsPage")]
-        public bool ShowProductThumbnailInOrderDetailsPage { get; set; }
-        public bool ShowProductThumbnailInOrderDetailsPage_OverrideForStore { get; set; }
-
         [NopResourceDisplayName("Admin.Configuration.Settings.Order.DeleteGiftCardUsageHistory")]
         public bool DeleteGiftCardUsageHistory { get; set; }
         public bool DeleteGiftCardUsageHistory_OverrideForStore { get; set; }

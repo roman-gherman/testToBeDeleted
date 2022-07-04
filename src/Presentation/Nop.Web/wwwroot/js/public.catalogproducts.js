@@ -43,7 +43,6 @@
         type: 'GET',
         success: function (response) {
           $('.products-wrapper').html(response);
-          $('html, body').animate({ scrollTop: $('.center-2 .page').offset().top }, 'slow');
           $(self).trigger({ type: "loaded" });
         },
         error: function () {

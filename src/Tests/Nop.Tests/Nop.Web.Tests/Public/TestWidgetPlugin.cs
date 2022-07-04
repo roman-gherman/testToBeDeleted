@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nop.Services.Cms;
 using Nop.Services.Plugins;
@@ -14,9 +13,9 @@ namespace Nop.Tests.Nop.Web.Tests.Public
             return Task.FromResult<IList<string>>(new List<string>{ "test widget zone" });
         }
 
-        public Type GetWidgetViewComponent(string widgetZone)
+        public string GetWidgetViewComponentName(string widgetZone)
         {
-            return typeof(TestWidgetPlugin);
+            return nameof(TestWidgetPlugin);
         }
     }
 }

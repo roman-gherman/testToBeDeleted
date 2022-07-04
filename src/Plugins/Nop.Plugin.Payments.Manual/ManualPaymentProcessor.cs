@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
-using Nop.Plugin.Payments.Manual.Components;
 using Nop.Plugin.Payments.Manual.Models;
 using Nop.Plugin.Payments.Manual.Validators;
 using Nop.Services.Configuration;
@@ -286,12 +285,12 @@ namespace Nop.Plugin.Payments.Manual
         }
 
         /// <summary>
-        /// Gets a type of a view component for displaying plugin in public store ("payment info" checkout step)
+        /// Gets a name of a view component for displaying plugin in public store ("payment info" checkout step)
         /// </summary>
-        /// <returns>View component type</returns>
-        public Type GetPublicViewComponent()
+        /// <returns>View component name</returns>
+        public string GetPublicViewComponentName()
         {
-            return typeof(PaymentManualViewComponent);
+            return "PaymentManual";
         }
 
         /// <summary>

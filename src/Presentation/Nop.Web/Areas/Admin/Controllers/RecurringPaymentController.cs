@@ -182,9 +182,9 @@ namespace Nop.Web.Areas.Admin.Controllers
                 var model = await _recurringPaymentModelFactory.PrepareRecurringPaymentModelAsync(null, payment);
 
                 //selected card
-                SaveSelectedCardName("recurringpayment-history");
+                SaveSelectedCardName("recurringpayment-history", persistForTheNextRequest: false);
 
-                return RedirectToAction("Edit", new { id = payment.Id });
+                return View(model);
             }
             catch (Exception exc)
             {
@@ -227,9 +227,9 @@ namespace Nop.Web.Areas.Admin.Controllers
                 var model = await _recurringPaymentModelFactory.PrepareRecurringPaymentModelAsync(null, payment);
 
                 //selected card
-                SaveSelectedCardName("recurringpayment-history");
+                SaveSelectedCardName("recurringpayment-history", persistForTheNextRequest: false);
 
-                return RedirectToAction("Edit", new { id = payment.Id });
+                return View(model);
             }
             catch (Exception exc)
             {

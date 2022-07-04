@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
+using Nop.Services.Common;
 
 namespace Nop.Services.Helpers
 {
@@ -15,6 +16,7 @@ namespace Nop.Services.Helpers
         #region Fields
 
         private readonly DateTimeSettings _dateTimeSettings;
+        private readonly IGenericAttributeService _genericAttributeService;
         private readonly IWorkContext _workContext;
 
         #endregion
@@ -22,9 +24,11 @@ namespace Nop.Services.Helpers
         #region Ctor
 
         public DateTimeHelper(DateTimeSettings dateTimeSettings,
+            IGenericAttributeService genericAttributeService,
             IWorkContext workContext)
         {
             _dateTimeSettings = dateTimeSettings;
+            _genericAttributeService = genericAttributeService;
             _workContext = workContext;
         }
 
@@ -152,16 +156,16 @@ namespace Nop.Services.Helpers
         /// A task that represents the asynchronous operation
         /// The task result contains the customer time zone; if customer is null, then default store time zone
         /// </returns>
-        public virtual Task<TimeZoneInfo> GetCustomerTimeZoneAsync(Customer customer)
+        public virtual async Task<TimeZoneInfo> GetCustomerTimeZoneAsync(Customer customer)
         {
-            if (!_dateTimeSettings.AllowCustomersToSetTimeZone)
-                return Task.FromResult(DefaultStoreTimeZone);
+            if (!_dateTimeSettings.AllowCustomersToSetTimeZone) 
+                return DefaultStoreTimeZone;
 
             TimeZoneInfo timeZoneInfo = null;
 
             var timeZoneId = string.Empty;
             if (customer != null)
-                timeZoneId = customer.TimeZoneId;
+                timeZoneId = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.TimeZoneIdAttribute);
 
             try
             {
@@ -173,7 +177,7 @@ namespace Nop.Services.Helpers
                 Debug.Write(exc.ToString());
             }
 
-            return Task.FromResult(timeZoneInfo ?? DefaultStoreTimeZone);
+            return timeZoneInfo ?? DefaultStoreTimeZone;
         }
 
         /// <summary>

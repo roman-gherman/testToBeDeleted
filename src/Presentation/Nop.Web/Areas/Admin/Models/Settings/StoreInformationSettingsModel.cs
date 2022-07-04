@@ -57,10 +57,6 @@ namespace Nop.Web.Areas.Admin.Models.Settings
         public string YoutubeLink { get; set; }
         public bool YoutubeLink_OverrideForStore { get; set; }
 
-        [NopResourceDisplayName("Admin.Configuration.Settings.GeneralCommon.InstagramLink")]
-        public string InstagramLink { get; set; }
-        public bool InstagramLink_OverrideForStore { get; set; }
-
         [NopResourceDisplayName("Admin.Configuration.Settings.GeneralCommon.SubjectFieldOnContactUsForm")]
         public bool SubjectFieldOnContactUsForm { get; set; }
         public bool SubjectFieldOnContactUsForm_OverrideForStore { get; set; }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Nop.Core.Domain.Messages
 {
@@ -28,11 +28,5 @@ namespace Nop.Core.Domain.Messages
         /// Additional tokens
         /// </summary>
         public IList<string> AdditionalTokens { get; }
-
-
-        /// <summary>
-        /// Token groups which can be used to filter the AdditionalTokens
-        /// </summary>
-        public IEnumerable<string> TokenGroups { get; set; }
     }
 }

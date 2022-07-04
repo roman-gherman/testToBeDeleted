@@ -1,25 +1,34 @@
 ﻿using System.Threading.Tasks;
+using Nop.Core.Infrastructure;
 using Nop.Services.Localization;
 
 namespace Nop.Web.Models.Common
 {
     public partial record PagerModel
     {
+        #region Ctor
+        
+        public PagerModel(ILocalizationService localizationService)
+        {
+            _localizationService = localizationService;
+        }
+
+        #endregion Constructors
+
         #region Fields
 
         private readonly ILocalizationService _localizationService;
+        private int individualPagesDisplayedCount;
+        private int pageIndex = -2;
+        private int pageSize;
 
-        private int _individualPagesDisplayedCount;
-        private int _pageIndex = -2;
-        private int _pageSize;
-
-        private bool? _showFirst;
-        private bool? _showIndividualPages;
-        private bool? _showLast;
-        private bool? _showNext;
-        private bool? _showPagerItems;
-        private bool? _showPrevious;
-        private bool? _showTotalSummary;
+        private bool? showFirst;
+        private bool? showIndividualPages;
+        private bool? showLast;
+        private bool? showNext;
+        private bool? showPagerItems;
+        private bool? showPrevious;
+        private bool? showTotalSummary;
 
         #endregion Fields
 
@@ -37,12 +46,12 @@ namespace Nop.Web.Models.Common
         {
             get
             {
-                if (_individualPagesDisplayedCount <= 0)
+                if (individualPagesDisplayedCount <= 0)
                     return 5;
 
-                return _individualPagesDisplayedCount;
+                return individualPagesDisplayedCount;
             }
-            set => _individualPagesDisplayedCount = value;
+            set => individualPagesDisplayedCount = value;
         }
 
         /// <summary>
@@ -50,8 +59,15 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public int PageIndex
         {
-            get => _pageIndex < 0 ? 0 : _pageIndex;
-            set => _pageIndex = value;
+            get
+            {
+                if (pageIndex < 0)
+                {
+                    return 0;
+                }
+                return pageIndex;
+            }
+            set => pageIndex = value;
         }
 
         /// <summary>
@@ -59,8 +75,8 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public int PageSize
         {
-            get => (_pageSize <= 0) ? 10 : _pageSize;
-            set => _pageSize = value;
+            get => (pageSize <= 0) ? 10 : pageSize;
+            set => pageSize = value;
         }
 
         /// <summary>
@@ -68,8 +84,8 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public bool ShowFirst
         {
-            get => _showFirst ?? true;
-            set => _showFirst = value;
+            get => showFirst ?? true;
+            set => showFirst = value;
         }
 
         /// <summary>
@@ -77,8 +93,8 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public bool ShowIndividualPages
         {
-            get => _showIndividualPages ?? true;
-            set => _showIndividualPages = value;
+            get => showIndividualPages ?? true;
+            set => showIndividualPages = value;
         }
 
         /// <summary>
@@ -86,8 +102,8 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public bool ShowLast
         {
-            get => _showLast ?? true;
-            set => _showLast = value;
+            get => showLast ?? true;
+            set => showLast = value;
         }
 
         /// <summary>
@@ -95,8 +111,8 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public bool ShowNext
         {
-            get => _showNext ?? true;
-            set => _showNext = value;
+            get => showNext ?? true;
+            set => showNext = value;
         }
 
         /// <summary>
@@ -104,8 +120,8 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public bool ShowPagerItems
         {
-            get => _showPagerItems ?? true;
-            set => _showPagerItems = value;
+            get => showPagerItems ?? true;
+            set => showPagerItems = value;
         }
 
         /// <summary>
@@ -113,8 +129,8 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public bool ShowPrevious
         {
-            get => _showPrevious ?? true;
-            set => _showPrevious = value;
+            get => showPrevious ?? true;
+            set => showPrevious = value;
         }
 
         /// <summary>
@@ -122,8 +138,8 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public bool ShowTotalSummary
         {
-            get => _showTotalSummary ?? false;
-            set => _showTotalSummary = value;
+            get => showTotalSummary ?? false;
+            set => showTotalSummary = value;
         }
 
         /// <summary>
@@ -133,14 +149,15 @@ namespace Nop.Web.Models.Common
         {
             get
             {
-                if (TotalRecords == 0 || PageSize == 0) 
+                if ((TotalRecords == 0) || (PageSize == 0))
+                {
                     return 0;
-
+                }
                 var num = TotalRecords / PageSize;
-
-                if ((TotalRecords % PageSize) > 0) 
+                if ((TotalRecords % PageSize) > 0)
+                {
                     num++;
-
+                }
                 return num;
             }
         }
@@ -150,43 +167,13 @@ namespace Nop.Web.Models.Common
         /// </summary>
         public int TotalRecords { get; set; }
 
-
-        /// <summary>
-        /// Gets or sets the route name or action name
-        /// </summary>
-        public string RouteActionName { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the links are created using RouteLink instead of Action Link 
-        /// (for additional route values such as slugs or page numbers)
-        /// </summary>
-        public bool UseRouteLinks { get; set; }
-
-        /// <summary>
-        /// Gets or sets the RouteValues object. Allows for custom route values other than page.
-        /// </summary>
-        public IRouteValues RouteValues { get; set; }
-
-        #endregion Properties
-
-        #region Ctor
-
-        public PagerModel(ILocalizationService localizationService)
-        {
-            _localizationService = localizationService;
-        }
-
-        #endregion
-
-        #region Methods
-
         /// <summary>
         /// Gets the first button text
         /// </summary>
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task<string> GetFirstButtonTextAsync()
         {
-            return await _localizationService.GetResourceAsync("Pager.First");
+           return await _localizationService.GetResourceAsync("Pager.First");
         }
 
         /// <summary>
@@ -213,7 +200,7 @@ namespace Nop.Web.Models.Common
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task<string> GetPreviousButtonTextAsync()
         {
-            return await _localizationService.GetResourceAsync("Pager.Previous");
+           return await _localizationService.GetResourceAsync("Pager.Previous");
         }
 
         /// <summary>
@@ -226,6 +213,26 @@ namespace Nop.Web.Models.Common
         }
 
         /// <summary>
+        /// Gets or sets the route name or action name
+        /// </summary>
+        public string RouteActionName { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the links are created using RouteLink instead of Action Link 
+        /// (for additional route values such as slugs or page numbers)
+        /// </summary>
+        public bool UseRouteLinks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the RouteValues object. Allows for custom route values other than page.
+        /// </summary>
+        public IRouteValues RouteValues { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
+        /// <summary>
         /// Gets first individual page index
         /// </summary>
         /// <returns>Page index</returns>
@@ -233,11 +240,13 @@ namespace Nop.Web.Models.Common
         {
             if ((TotalPages < IndividualPagesDisplayedCount) ||
                 ((PageIndex - (IndividualPagesDisplayedCount / 2)) < 0))
+            {
                 return 0;
-
-            if ((PageIndex + (IndividualPagesDisplayedCount / 2)) >= TotalPages) 
+            }
+            if ((PageIndex + (IndividualPagesDisplayedCount / 2)) >= TotalPages)
+            {
                 return (TotalPages - IndividualPagesDisplayedCount);
-
+            }
             return (PageIndex - (IndividualPagesDisplayedCount / 2));
         }
 
@@ -248,17 +257,20 @@ namespace Nop.Web.Models.Common
         public int GetLastIndividualPageIndex()
         {
             var num = IndividualPagesDisplayedCount / 2;
-            if ((IndividualPagesDisplayedCount % 2) == 0) 
+            if ((IndividualPagesDisplayedCount % 2) == 0)
+            {
                 num--;
-
+            }
             if ((TotalPages < IndividualPagesDisplayedCount) ||
                 ((PageIndex + num) >= TotalPages))
+            {
                 return (TotalPages - 1);
-
-            if ((PageIndex - (IndividualPagesDisplayedCount / 2)) < 0) 
+            }
+            if ((PageIndex - (IndividualPagesDisplayedCount / 2)) < 0)
+            {
                 return (IndividualPagesDisplayedCount - 1);
-
-            return PageIndex + num;
+            }
+            return (PageIndex + num);
         }
 
         #endregion Methods
@@ -271,7 +283,7 @@ namespace Nop.Web.Models.Common
     /// </summary>
     public interface IRouteValues
     {
-        int PageNumber { get; set; }
+        int pageNumber { get; set; }
     }
 
     /// <summary>
@@ -280,9 +292,9 @@ namespace Nop.Web.Models.Common
     /// </summary>
     public partial record RouteValues : IRouteValues
     {
-        public int Id { get; set; }
-        public string Slug { get; set; }
-        public int PageNumber { get; set; }
+        public int id { get; set; }
+        public string slug { get; set; }
+        public int pageNumber { get; set; }
     }
 
     /// <summary>
@@ -290,12 +302,12 @@ namespace Nop.Web.Models.Common
     /// </summary>
     public partial record ForumSearchRouteValues : IRouteValues
     {
-        public string Searchterms { get; set; }
-        public string Advs { get; set; }
-        public string ForumId { get; set; }
-        public string Within { get; set; }
-        public string LimitDays { get; set; }
-        public int PageNumber { get; set; }
+        public string searchterms { get; set; }
+        public string advs { get; set; }
+        public string forumId { get; set; }
+        public string within { get; set; }
+        public string limitDays { get; set; }
+        public int pageNumber { get; set; }
     }
 
     /// <summary>
@@ -303,8 +315,8 @@ namespace Nop.Web.Models.Common
     /// </summary>
     public partial record PrivateMessageRouteValues : IRouteValues
     {
-        public string Tab { get; set; }
-        public int PageNumber { get; set; }
+        public string tab { get; set; }
+        public int pageNumber { get; set; }
     }
 
     /// <summary>
@@ -312,15 +324,15 @@ namespace Nop.Web.Models.Common
     /// </summary>
     public partial record ForumActiveDiscussionsRouteValues : IRouteValues
     {
-        public int PageNumber { get; set; }
+        public int pageNumber { get; set; }
     }
 
     /// <summary>
     /// record that has only page for route value. Used for (My Account) Forum Subscriptions pagination
     /// </summary>
     public partial record ForumSubscriptionsRouteValues : IRouteValues
-    {
-        public int PageNumber { get; set; }
+    {        
+        public int pageNumber { get; set; }
     }
 
     /// <summary>
@@ -328,7 +340,7 @@ namespace Nop.Web.Models.Common
     /// </summary>
     public partial record BackInStockSubscriptionsRouteValues : IRouteValues
     {
-        public int PageNumber { get; set; }
+        public int pageNumber { get; set; }
     }
 
     /// <summary>
@@ -336,7 +348,7 @@ namespace Nop.Web.Models.Common
     /// </summary>
     public partial record RewardPointsRouteValues : IRouteValues
     {
-        public int PageNumber { get; set; }
+        public int pageNumber { get; set; }
     }
 
     #endregion Classes

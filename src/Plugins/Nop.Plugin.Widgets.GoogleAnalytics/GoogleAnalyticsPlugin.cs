@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nop.Core;
-using Nop.Plugin.Widgets.GoogleAnalytics.Components;
 using Nop.Services.Cms;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
@@ -60,13 +58,13 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics
         }
 
         /// <summary>
-        /// Gets a type of a view component for displaying widget
+        /// Gets a name of a view component for displaying widget
         /// </summary>
         /// <param name="widgetZone">Name of the widget zone</param>
-        /// <returns>View component type</returns>
-        public Type GetWidgetViewComponent(string widgetZone)
+        /// <returns>View component name</returns>
+        public string GetWidgetViewComponentName(string widgetZone)
         {
-            return typeof(WidgetsGoogleAnalyticsViewComponent);
+            return "WidgetsGoogleAnalytics";
         }
 
         /// <summary>
@@ -107,7 +105,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics
                 ["Plugins.Widgets.GoogleAnalytics.IncludeCustomerId.Hint"] = "Check to include customer identifier to script.",
                 ["Plugins.Widgets.GoogleAnalytics.IncludingTax"] = "Include tax",
                 ["Plugins.Widgets.GoogleAnalytics.IncludingTax.Hint"] = "Check to include tax when generating tracking code for eCommerce part.",
-                ["Plugins.Widgets.GoogleAnalytics.Instructions"] = "<p>Google Analytics is a free website stats tool from Google. It keeps track of statistics about the visitors and eCommerce conversion on your website.<br /><br />Follow the next steps to enable Google Analytics integration:<br /><ul><li><a href=\"http://www.google.com/analytics/\" target=\"_blank\">Create a Google Analytics account</a> and follow the wizard to add your website</li><li>Copy the Tracking ID into the 'ID' box below</li><li>Click the 'Save' button below and Google Analytics will be integrated into your store</li></ul><br /></p>"
+                ["Plugins.Widgets.GoogleAnalytics.Instructions"] = "<p>Google Analytics is a free website stats tool from Google. It keeps track of statistics about the visitors and eCommerce conversion on your website.<br /><br />Follow the next steps to enable Google Analytics integration:<br /><ul><li><a href=\"http://www.google.com/analytics/\" target=\"_blank\">Create a Google Analytics account</a> and follow the wizard to add your website</li><li>Copy the Tracking ID into the 'ID' box below</li><li>Click the 'Save' button below and Google Analytics will be integrated into your store</li></ul><br />If you would like to switch between Google Analytics (used by default) and Universal Analytics, then please use the buttons below:</p>"
             });
 
             await base.InstallAsync();

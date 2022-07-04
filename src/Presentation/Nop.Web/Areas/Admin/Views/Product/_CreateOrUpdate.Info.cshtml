@@ -19,12 +19,14 @@
     $(document).ready(function() {
         @if (!Model.IsLoggedInAsVendor)
         {
-            <text>
-            $("#@Html.IdFor(model => model.ShowOnHomepage)").click(toggleShowOnHomepage);
-            toggleShowOnHomepage();
-            </text>
+            <text>$("#@Html.IdFor(model => model.ShowOnHomepage)").click(toggleShowOnHomepage);</text>
         }
         $("#@Html.IdFor(model => model.ProductTypeId)").change(toggleProductType);
+
+        @if (!Model.IsLoggedInAsVendor)
+        {
+            <text>toggleShowOnHomepage();</text>
+        }
         toggleProductType();
     });
 
@@ -520,7 +522,7 @@
                     </script>
                 </div>
                 <div class="col-md-8">
-                    @await Component.InvokeAsync(typeof(AclDisabledWarningViewComponent))
+                    @await Component.InvokeAsync("AclDisabledWarning")
                 </div>
             </div>
         </div>
@@ -556,7 +558,7 @@
                     </script>
                 </div>
                 <div class="col-md-8">
-                    @await Component.InvokeAsync(typeof(MultistoreDisabledWarningViewComponent))
+                    @await Component.InvokeAsync("MultistoreDisabledWarning")
                 </div>
             </div>
         </div>

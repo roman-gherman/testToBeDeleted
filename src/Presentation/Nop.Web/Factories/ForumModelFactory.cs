@@ -404,7 +404,8 @@ namespace Nop.Web.Factories
                 forumPostModel.ShowCustomersLocation = _customerSettings.ShowCustomersLocation && !customerIsGuest;
                 if (_customerSettings.ShowCustomersLocation)
                 {
-                    var country = await _countryService.GetCountryByIdAsync(customer.CountryId);
+                    var countryId = await _genericAttributeService.GetAttributeAsync<Customer, int>(post.CustomerId, NopCustomerDefaults.CountryIdAttribute);
+                    var country = await _countryService.GetCountryByIdAsync(countryId);
                     forumPostModel.CustomerLocation = country != null ? await _localizationService.GetLocalizedAsync(country, x => x.Name) : string.Empty;
                 }
 
@@ -999,7 +1000,7 @@ namespace Nop.Web.Factories
                 ShowTotalSummary = false,
                 RouteActionName = "CustomerForumSubscriptions",
                 UseRouteLinks = true,
-                RouteValues = new ForumSubscriptionsRouteValues { PageNumber = pageIndex }
+                RouteValues = new ForumSubscriptionsRouteValues { pageNumber = pageIndex }
             };
 
             return model;

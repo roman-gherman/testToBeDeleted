@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Nop.Core.Domain.Cms;
-using Nop.Plugin.Widgets.AccessiBe.Components;
 using Nop.Services.Cms;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
@@ -75,16 +74,16 @@ namespace Nop.Plugin.Widgets.AccessiBe
         }
 
         /// <summary>
-        /// Gets a type of a view component for displaying widget
+        /// Gets a name of a view component for displaying widget
         /// </summary>
         /// <param name="widgetZone">Name of the widget zone</param>
-        /// <returns>View component type</returns>
-        public Type GetWidgetViewComponent(string widgetZone)
+        /// <returns>View component name</returns>
+        public string GetWidgetViewComponentName(string widgetZone)
         {
             if (widgetZone == null)
                 throw new ArgumentNullException(nameof(widgetZone));
 
-            return typeof(AccessiBeViewComponent);
+            return AccessiBeDefaults.VIEW_COMPONENT;
         }
 
         /// <summary>
@@ -95,7 +94,7 @@ namespace Nop.Plugin.Widgets.AccessiBe
         {
             await _settingService.SaveSettingAsync(new AccessiBeSettings
             {
-                WidgetZone = PublicWidgetZones.BodyStartHtmlTagAfter
+                WidgetZone = PublicWidgetZones.HeadHtmlTag
             });
 
             await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>

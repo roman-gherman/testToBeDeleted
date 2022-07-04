@@ -14,7 +14,6 @@ using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Services.Catalog;
 using Nop.Services.Configuration;
-using Nop.Services.Logging;
 using Nop.Services.Seo;
 
 namespace Nop.Services.Media
@@ -46,7 +45,6 @@ namespace Nop.Services.Media
         public AzurePictureService(AppSettings appSettings,
             IDownloadService downloadService,
             IHttpContextAccessor httpContextAccessor,
-            ILogger logger,
             INopFileProvider fileProvider,
             IProductAttributeParser productAttributeParser,
             IRepository<Picture> pictureRepository,
@@ -59,7 +57,6 @@ namespace Nop.Services.Media
             MediaSettings mediaSettings)
             : base(downloadService,
                   httpContextAccessor,
-                  logger,
                   fileProvider,
                   productAttributeParser,
                   pictureRepository,

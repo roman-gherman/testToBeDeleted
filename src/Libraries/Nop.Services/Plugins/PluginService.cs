@@ -205,20 +205,8 @@ namespace Nop.Services.Plugins
             _migrationManager.ApplyUpMigrations(assembly, migrationProcessType);
         }
 
-        protected virtual bool PluginsUploaded()
-        {
-            var pluginsDirectories =
-                _fileProvider.GetDirectories(_fileProvider.MapPath(NopPluginDefaults.UploadedPath));
-
-            if (!pluginsDirectories.Any())
-                return false;
-
-            return pluginsDirectories.Any(d =>
-                _fileProvider.GetFiles(d, "*.dll").Any() || _fileProvider.GetFiles(d, "plugin.json").Any());
-        }
-
         #endregion
-
+                 
         #region Methods
 
         /// <summary>
@@ -239,7 +227,7 @@ namespace Nop.Services.Plugins
         public virtual async Task<IList<PluginDescriptor>> GetPluginDescriptorsAsync<TPlugin>(LoadPluginsMode loadMode = LoadPluginsMode.InstalledOnly,
             Customer customer = null, int storeId = 0, string group = null, string dependsOnSystemName = "", string friendlyName = null, string author = null) where TPlugin : class, IPlugin
         {
-            var pluginDescriptors = _pluginsInfo.PluginDescriptors.Select(p=>p.pluginDescriptor).ToList();
+            var pluginDescriptors = _pluginsInfo.PluginDescriptors;
 
             //filter plugins
             pluginDescriptors = await pluginDescriptors.WhereAwait(async descriptor =>
@@ -315,10 +303,9 @@ namespace Nop.Services.Plugins
 
             //try to do magic
             var pluginDescriptor = _pluginsInfo.PluginDescriptors.FirstOrDefault(descriptor =>
-                descriptor.pluginDescriptor?.ReferencedAssembly?.FullName?.Equals(typeInAssembly.Assembly.FullName,
-                    StringComparison.InvariantCultureIgnoreCase) ?? false);
+               descriptor.ReferencedAssembly?.FullName.Equals(typeInAssembly.Assembly.FullName, StringComparison.InvariantCultureIgnoreCase) ?? false);
 
-            return pluginDescriptor.pluginDescriptor?.Instance<IPlugin>();
+            return pluginDescriptor?.Instance<IPlugin>();
         }
 
         /// <summary>
@@ -474,10 +461,7 @@ namespace Nop.Services.Plugins
             _pluginsInfo.Save();
 
             //display all plugins on the plugin list page
-            _pluginsInfo.PluginDescriptors.ToList().ForEach(pluginDescriptor => pluginDescriptor.pluginDescriptor.ShowInPluginsList = true);
-
-            //clear the uploaded directory
-            foreach (var directory in _fileProvider.GetDirectories(_fileProvider.MapPath(NopPluginDefaults.UploadedPath))) _fileProvider.DeleteDirectory(directory);
+            _pluginsInfo.PluginDescriptors.ToList().ForEach(pluginDescriptor => pluginDescriptor.ShowInPluginsList = true);
         }
 
         /// <summary>
@@ -495,11 +479,11 @@ namespace Nop.Services.Plugins
         public virtual async Task InstallPluginsAsync()
         {
             //get all uninstalled plugins
-            var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => !descriptor.pluginDescriptor.Installed).ToList();
+            var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => !descriptor.Installed).ToList();
 
             //filter plugins need to install
             pluginDescriptors = pluginDescriptors.Where(descriptor => _pluginsInfo.PluginNamesToInstall
-                .Any(item => item.SystemName.Equals(descriptor.pluginDescriptor.SystemName))).ToList();
+                .Any(item => item.SystemName.Equals(descriptor.SystemName))).ToList();
             if (!pluginDescriptors.Any())
                 return;
 
@@ -508,34 +492,34 @@ namespace Nop.Services.Plugins
             var customerActivityService = EngineContext.Current.Resolve<ICustomerActivityService>();
 
             //install plugins
-            foreach (var descriptor in pluginDescriptors.OrderBy(pluginDescriptor => pluginDescriptor.pluginDescriptor.DisplayOrder))
+            foreach (var descriptor in pluginDescriptors.OrderBy(pluginDescriptor => pluginDescriptor.DisplayOrder))
             {
                 try
                 {
-                    InsertPluginData(descriptor.pluginDescriptor.PluginType, MigrationProcessType.Installation);
+                    InsertPluginData(descriptor.PluginType, MigrationProcessType.Installation);
 
                     //try to install an instance
-                    await descriptor.pluginDescriptor.Instance<IPlugin>().InstallAsync();
+                    await descriptor.Instance<IPlugin>().InstallAsync();
 
                     //remove and add plugin system name to appropriate lists
                     var pluginToInstall = _pluginsInfo.PluginNamesToInstall
-                        .FirstOrDefault(plugin => plugin.SystemName.Equals(descriptor.pluginDescriptor.SystemName));
-                    _pluginsInfo.InstalledPlugins.Add(descriptor.pluginDescriptor.GetBaseInfoCopy);
+                        .FirstOrDefault(plugin => plugin.SystemName.Equals(descriptor.SystemName));
+                    _pluginsInfo.InstalledPlugins.Add(descriptor.GetBaseInfoCopy);
                     _pluginsInfo.PluginNamesToInstall.Remove(pluginToInstall);
 
                     //activity log
                     var customer = await _customerService.GetCustomerByGuidAsync(pluginToInstall.CustomerGuid ?? Guid.Empty);
                     await customerActivityService.InsertActivityAsync(customer, "InstallNewPlugin",
-                        string.Format(await localizationService.GetResourceAsync("ActivityLog.InstallNewPlugin"), descriptor.pluginDescriptor.SystemName));
+                        string.Format(await localizationService.GetResourceAsync("ActivityLog.InstallNewPlugin"), descriptor.SystemName));
 
                     //mark the plugin as installed
-                    descriptor.pluginDescriptor.Installed = true;
-                    descriptor.pluginDescriptor.ShowInPluginsList = true;
+                    descriptor.Installed = true;
+                    descriptor.ShowInPluginsList = true;
                 }
                 catch (Exception exception)
                 {
                     //log error
-                    var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotInstalled"), descriptor.pluginDescriptor.SystemName);
+                    var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotInstalled"), descriptor.SystemName);
                     await _logger.ErrorAsync(message, exception);
                 }
             }
@@ -551,11 +535,11 @@ namespace Nop.Services.Plugins
         public virtual async Task UninstallPluginsAsync()
         {
             //get all installed plugins
-            var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => descriptor.pluginDescriptor.Installed).ToList();
+            var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => descriptor.Installed).ToList();
 
             //filter plugins need to uninstall
             pluginDescriptors = pluginDescriptors
-                .Where(descriptor => _pluginsInfo.PluginNamesToUninstall.Contains(descriptor.pluginDescriptor.SystemName)).ToList();
+                .Where(descriptor => _pluginsInfo.PluginNamesToUninstall.Contains(descriptor.SystemName)).ToList();
             if (!pluginDescriptors.Any())
                 return;
 
@@ -564,33 +548,33 @@ namespace Nop.Services.Plugins
             var customerActivityService = EngineContext.Current.Resolve<ICustomerActivityService>();
 
             //uninstall plugins
-            foreach (var descriptor in pluginDescriptors.OrderByDescending(pluginDescriptor => pluginDescriptor.pluginDescriptor.DisplayOrder))
+            foreach (var descriptor in pluginDescriptors.OrderByDescending(pluginDescriptor => pluginDescriptor.DisplayOrder))
             {
                 try
                 {
-                    var plugin = descriptor.pluginDescriptor.Instance<IPlugin>();
+                    var plugin = descriptor.Instance<IPlugin>();
                     //try to uninstall an instance
                     await plugin.UninstallAsync();
 
                     //clear plugin data on the database
-                    DeletePluginData(descriptor.pluginDescriptor.PluginType);
+                    DeletePluginData(descriptor.PluginType);
 
                     //remove plugin system name from appropriate lists
-                    _pluginsInfo.InstalledPlugins.Remove(descriptor.pluginDescriptor);
-                    _pluginsInfo.PluginNamesToUninstall.Remove(descriptor.pluginDescriptor.SystemName);
+                    _pluginsInfo.InstalledPlugins.Remove(descriptor);
+                    _pluginsInfo.PluginNamesToUninstall.Remove(descriptor.SystemName);
 
                     //activity log
                     await customerActivityService.InsertActivityAsync("UninstallPlugin",
-                        string.Format(await localizationService.GetResourceAsync("ActivityLog.UninstallPlugin"), descriptor.pluginDescriptor.SystemName));
+                        string.Format(await localizationService.GetResourceAsync("ActivityLog.UninstallPlugin"), descriptor.SystemName));
 
                     //mark the plugin as uninstalled
-                    descriptor.pluginDescriptor.Installed = false;
-                    descriptor.pluginDescriptor.ShowInPluginsList = true;
+                    descriptor.Installed = false;
+                    descriptor.ShowInPluginsList = true;
                 }
                 catch (Exception exception)
                 {
                     //log error
-                    var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotUninstalled"), descriptor.pluginDescriptor.SystemName);
+                    var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotUninstalled"), descriptor.SystemName);
                     await _logger.ErrorAsync(message, exception);
                 }
             }
@@ -606,11 +590,11 @@ namespace Nop.Services.Plugins
         public virtual async Task DeletePluginsAsync()
         {
             //get all uninstalled plugins (delete plugin only previously uninstalled)
-            var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => !descriptor.pluginDescriptor.Installed).ToList();
+            var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => !descriptor.Installed).ToList();
 
             //filter plugins need to delete
             pluginDescriptors = pluginDescriptors
-                .Where(descriptor => _pluginsInfo.PluginNamesToDelete.Contains(descriptor.pluginDescriptor.SystemName)).ToList();
+                .Where(descriptor => _pluginsInfo.PluginNamesToDelete.Contains(descriptor.SystemName)).ToList();
             if (!pluginDescriptors.Any())
                 return;
 
@@ -624,21 +608,21 @@ namespace Nop.Services.Plugins
                 try
                 {
                     //try to delete a plugin directory from disk storage
-                    var pluginDirectory = _fileProvider.GetDirectoryName(descriptor.pluginDescriptor.OriginalAssemblyFile);
+                    var pluginDirectory = _fileProvider.GetDirectoryName(descriptor.OriginalAssemblyFile);
                     if (_fileProvider.DirectoryExists(pluginDirectory))
                         _fileProvider.DeleteDirectory(pluginDirectory);
 
                     //remove plugin system name from the appropriate list
-                    _pluginsInfo.PluginNamesToDelete.Remove(descriptor.pluginDescriptor.SystemName);
+                    _pluginsInfo.PluginNamesToDelete.Remove(descriptor.SystemName);
 
                     //activity log
                     await customerActivityService.InsertActivityAsync("DeletePlugin",
-                        string.Format(await localizationService.GetResourceAsync("ActivityLog.DeletePlugin"), descriptor.pluginDescriptor.SystemName));
+                        string.Format(await localizationService.GetResourceAsync("ActivityLog.DeletePlugin"), descriptor.SystemName));
                 }
                 catch (Exception exception)
                 {
                     //log error
-                    var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotDeleted"), descriptor.pluginDescriptor.SystemName);
+                    var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotDeleted"), descriptor.SystemName);
                     await _logger.ErrorAsync(message, exception);
                 }
             }
@@ -653,11 +637,10 @@ namespace Nop.Services.Plugins
         /// <returns>Result of check</returns>
         public virtual bool IsRestartRequired()
         {
-            //return true if any of lists contains items or some plugins were uploaded
+            //return true if any of lists contains items
             return _pluginsInfo.PluginNamesToInstall.Any()
-                   || _pluginsInfo.PluginNamesToUninstall.Any()
-                   || _pluginsInfo.PluginNamesToDelete.Any()
-                   || PluginsUploaded();
+                || _pluginsInfo.PluginNamesToUninstall.Any()
+                || _pluginsInfo.PluginNamesToDelete.Any();
         }
 
         /// <summary>
@@ -669,22 +652,22 @@ namespace Nop.Services.Plugins
             foreach (var installedPlugin in _pluginsInfo.InstalledPlugins)
             {
                 var newVersion = _pluginsInfo.PluginDescriptors.FirstOrDefault(pd =>
-                    pd.pluginDescriptor.SystemName.Equals(installedPlugin.SystemName, StringComparison.InvariantCultureIgnoreCase));
+                    pd.SystemName.Equals(installedPlugin.SystemName, StringComparison.InvariantCultureIgnoreCase));
 
-                if (newVersion.pluginDescriptor == null)
+                if (newVersion == null)
                     continue;
 
-                if (installedPlugin.Version == newVersion.pluginDescriptor.Version)
+                if (installedPlugin.Version == newVersion.Version)
                     continue;
                 
                 //run new migrations from the plugin if there are exists
-                InsertPluginData(newVersion.pluginDescriptor.PluginType, MigrationProcessType.Update);
+                InsertPluginData(newVersion.PluginType, MigrationProcessType.Update);
 
                 //run the plugin update logic
-                await newVersion.pluginDescriptor.Instance<IPlugin>().UpdateAsync(installedPlugin.Version, newVersion.pluginDescriptor.Version);
+                await newVersion.Instance<IPlugin>().UpdateAsync(installedPlugin.Version, newVersion.Version);
 
                 //update installed plugin info
-                installedPlugin.Version = newVersion.pluginDescriptor.Version;
+                installedPlugin.Version = newVersion.Version;
             }
 
             await _pluginsInfo.SaveAsync();

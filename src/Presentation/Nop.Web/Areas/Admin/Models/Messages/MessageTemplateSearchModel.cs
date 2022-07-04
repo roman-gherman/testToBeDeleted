@@ -15,7 +15,6 @@ namespace Nop.Web.Areas.Admin.Models.Messages
         public MessageTemplateSearchModel()
         {
             AvailableStores = new List<SelectListItem>();
-            AvailableActiveOptions = new List<SelectListItem>();
         }
 
         #endregion
@@ -28,12 +27,7 @@ namespace Nop.Web.Areas.Admin.Models.Messages
         [NopResourceDisplayName("Admin.ContentManagement.MessageTemplates.List.SearchStore")]
         public int SearchStoreId { get; set; }
 
-        [NopResourceDisplayName("Admin.ContentManagement.MessageTemplates.List.IsActive")]
-        public int IsActiveId { get; set; }
-
         public IList<SelectListItem> AvailableStores { get; set; }
-
-        public IList<SelectListItem> AvailableActiveOptions { get; set; }
 
         public bool HideStoresList { get; set; }
 
