@@ -801,7 +801,7 @@ label, label + * {
   left: 50%;
   z-index: 1050;
   width: 320px;
-  height: auto;
+  height: 180px;
   margin: -90px 0 0 -160px;
   border: 1px solid #ccc;
   box-shadow: 0 0 2px rgba(0,0,0,0.15);
@@ -1192,7 +1192,7 @@ label, label + * {
   background-position: -114px 0;
 }
 
-.follow-us .social .instagram a {
+.follow-us .social .google-plus a {
   background-position: -152px 0;
 }
 
@@ -1591,9 +1591,13 @@ label, label + * {
   font-size: 0;
 }
 
+.product-filter + .product-filter {
+  margin-top: 20px;
+}
+
 .product-filter .filter-title {
   margin: 0 0 10px;
-  background: #f6f6f6 url('../images/toggle-gray.png') right 10px no-repeat;
+  background-color: #f6f6f6;
   padding: 10px;
   font-size: 17px;
   color: #444;
@@ -1606,7 +1610,6 @@ label, label + * {
 .product-filter .filter-content {
   padding: 10px;
   color: #444;
-  margin-bottom: 20px;
 }
 
 .product-filter .group {
@@ -1764,18 +1767,7 @@ label, label + * {
   height: 14px;
 }
 
-.product-grid .item-box .description:not([data-short-description]) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  margin: 0 0 15px;
-  height: 66px;
-  line-height: 22px;
-}
-
-.item-box .description[data-short-description] {
+.item-box .description {
   display: none;
 }
 
@@ -2063,8 +2055,7 @@ label, label + * {
 }
 
 .gallery .picture img,
-.picture-gallery .picture-thumbs img,
-.video-gallery .video-thumbs iframe,
+.gallery .picture-thumbs img,
 .variant-picture img {
   position: absolute;
   top: 0;
@@ -2076,12 +2067,12 @@ label, label + * {
   margin: auto;
 }
 
-.picture-gallery .picture-thumbs {
+.gallery .picture-thumbs {
   overflow: hidden;
   font-size: 0;
 }
 
-.picture-gallery .picture-thumbs .thumb-item {
+.gallery .picture-thumbs .thumb-item {
   display: inline-block;
   position: relative;
   width: 100px;
@@ -2089,13 +2080,6 @@ label, label + * {
   margin: 0 5px 10px;
   overflow: hidden;
   cursor: pointer;
-}
-
-.video-gallery .video-thumbs .thumb-item {
-  display: inline-block;
-  position: relative;
-  margin: 0 5px 10px;
-  overflow: hidden;
 }
 
 .overview {
@@ -8159,16 +8143,12 @@ label, label + * {
   /*** COLUMN ***/
 
 
-  .product-filter .filter-title {
-    background: #f6f6f6;
-  }
-
   .block {
     float: none;
     width: auto;
     margin: 0 0 20px;
   }
-  
+
   .block .title {
     margin: 0;
     border-bottom: 1px solid #ddd;
@@ -8245,12 +8225,7 @@ label, label + * {
     width: 46%;
   }
 
-  .picture-gallery .picture {
-    width: auto;
-  }
-
-  .video-gallery {
-    float: left;
+  .gallery .picture {
     width: auto;
   }
 
@@ -8777,33 +8752,4 @@ label, label + * {
     width: 930px;
     max-width: 100%;
   }
-}
-
-.swiper {
-  width: 100%;
-  height: 100%;
-}
-
-.swiper-slide {
-  text-align: center;
-  font-size: 18px;
-  background: #fff;
-  /* Center slide text vertically */
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  -webkit-align-items: center;
-  align-items: center;
-}
-
-.swiper-pagination-bullet-active {
-  padding: 5px;
-  background-color: #4ab2f1;
 }

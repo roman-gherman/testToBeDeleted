@@ -294,11 +294,6 @@ namespace Nop.Tests.Nop.Services.Tests.ExportImport
         [Test]
         public async Task CanExportCustomersToXlsx()
         {
-            var replacePairs = new Dictionary<string, string>
-            {
-                { "VatNumberStatus", "VatNumberStatusId" }
-            };
-
             var customers = await _customerService.GetAllCustomersAsync();
 
             var excelData = await _exportManager.ExportCustomersToXlsxAsync(customers);
@@ -306,8 +301,6 @@ namespace Nop.Tests.Nop.Services.Tests.ExportImport
             var manager = GetPropertyManager<Customer>(worksheet);
 
             manager.ReadFromXlsx(worksheet, 2);
-            manager.SetSelectList("VatNumberStatus", await VatNumberStatus.Unknown.ToSelectListAsync(useLocalization: false));
-
             var customer = customers.First();
 
             var ignore = new List<string> { "Id", "ExternalAuthenticationRecords", "CustomerRoles", "ShoppingCartItems",
@@ -315,13 +308,10 @@ namespace Nop.Tests.Nop.Services.Tests.ExportImport
                 "EmailToRevalidate", "HasShoppingCartItems", "RequireReLogin", "FailedLoginAttempts",
                 "CannotLoginUntilDateUtc", "Deleted", "IsSystemAccount", "SystemName", "LastIpAddress",
                 "LastLoginDateUtc", "LastActivityDateUtc", "RegisteredInStoreId", "BillingAddressId", "ShippingAddressId",
-                "CustomerCustomerRoleMappings", "CustomerAddressMappings", "EntityCacheKey", "VendorId",
-                "DateOfBirth", "StreetAddress", "StreetAddress2", "ZipPostalCode", "City", "County", "CountryId",
-                "StateProvinceId", "Phone", "Fax", "VatNumberStatusId", "TimeZoneId", "CustomCustomerAttributesXML",
-                "CurrencyId", "LanguageId", "TaxDisplayTypeId", "TaxDisplayType", "TaxDisplayType", "VatNumberStatusId" };
+                "CustomerCustomerRoleMappings", "CustomerAddressMappings", "EntityCacheKey", "VendorId" };
 
             AreAllObjectPropertiesPresent(customer, manager, ignore.ToArray());
-            PropertiesShouldEqual(customer, manager, replacePairs);
+            PropertiesShouldEqual(customer, manager, new Dictionary<string, string>());
         }
 
         [Test]

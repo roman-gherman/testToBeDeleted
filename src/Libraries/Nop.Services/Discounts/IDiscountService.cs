@@ -201,7 +201,6 @@ namespace Nop.Services.Discounts
         /// <param name="discountId">Discount identifier; null to load all records</param>
         /// <param name="customerId">Customer identifier; null to load all records</param>
         /// <param name="orderId">Order identifier; null to load all records</param>
-        /// <param name="includeCancelledOrders">Include cancelled orders</param>
         /// <param name="pageIndex">Page index</param>
         /// <param name="pageSize">Page size</param>
         /// <returns>
@@ -209,7 +208,7 @@ namespace Nop.Services.Discounts
         /// The task result contains the discount usage history records
         /// </returns>
         Task<IPagedList<DiscountUsageHistory>> GetAllDiscountUsageHistoryAsync(int? discountId = null,
-            int? customerId = null, int? orderId = null, bool includeCancelledOrders = true,
+            int? customerId = null, int? orderId = null,
             int pageIndex = 0, int pageSize = int.MaxValue);
 
         /// <summary>

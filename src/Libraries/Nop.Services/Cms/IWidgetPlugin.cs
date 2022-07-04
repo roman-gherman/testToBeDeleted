@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nop.Services.Plugins;
 
@@ -25,10 +24,10 @@ namespace Nop.Services.Cms
         Task<IList<string>> GetWidgetZonesAsync();
 
         /// <summary>
-        /// Gets a type of a view component for displaying widget
+        /// Gets a name of a view component for displaying widget
         /// </summary>
         /// <param name="widgetZone">Name of the widget zone</param>
-        /// <returns>View component type</returns>
-        Type GetWidgetViewComponent(string widgetZone);
+        /// <returns>View component name</returns>
+        string GetWidgetViewComponentName(string widgetZone);
     }
 }

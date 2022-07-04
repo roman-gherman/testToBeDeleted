@@ -1,19 +1,22 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Routing;
 using Nop.Core.Domain.Seo;
 
 namespace Nop.Web.Framework.Events
 {
     /// <summary>
-    /// Represents an event that occurs when a generic route is processed and before default transformation
+    /// Represents an event that occurs when a generic route is processed and no default handlers are found
     /// </summary>
     public class GenericRoutingEvent
     {
         #region Ctor
 
-        public GenericRoutingEvent(HttpContext httpContext, RouteValueDictionary values, UrlRecord urlRecord)
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="values">Route values</param>
+        /// <param name="urlRecord">Found URL record</param>
+        public GenericRoutingEvent(RouteValueDictionary values, UrlRecord urlRecord)
         {
-            HttpContext = httpContext;
             RouteValues = values;
             UrlRecord = urlRecord;
         }
@@ -23,24 +26,14 @@ namespace Nop.Web.Framework.Events
         #region Properties
 
         /// <summary>
-        /// Gets HTTP context
-        /// </summary>
-        public HttpContext HttpContext { get; private set; }
-
-        /// <summary>
-        /// Gets route values associated with the current match
+        /// Gets route values
         /// </summary>
         public RouteValueDictionary RouteValues { get; private set; }
 
         /// <summary>
-        /// Gets record found by the URL slug
+        /// Gets URL record found by the route slug
         /// </summary>
         public UrlRecord UrlRecord { get; private set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the event was handled and values should be used without further processing
-        /// </summary>
-        public bool Handled { get; set; }
 
         #endregion
     }

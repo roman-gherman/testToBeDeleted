@@ -73,7 +73,6 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
         private readonly IStoreService _storeService;
         private readonly IUrlRecordService _urlRecordService;
-        private readonly IVideoService _videoService;
         private readonly IWorkContext _workContext;
         private readonly MeasureSettings _measureSettings;
         private readonly TaxSettings _taxSettings;
@@ -114,7 +113,6 @@ namespace Nop.Web.Areas.Admin.Factories
             IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
             IStoreService storeService,
             IUrlRecordService urlRecordService,
-            IVideoService videoService,
             IWorkContext workContext,
             MeasureSettings measureSettings,
             TaxSettings taxSettings,
@@ -152,7 +150,6 @@ namespace Nop.Web.Areas.Admin.Factories
             _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
             _storeService = storeService;
             _urlRecordService = urlRecordService;
-            _videoService = videoService;
             _workContext = workContext;
             _taxSettings = taxSettings;
             _vendorSettings = vendorSettings;
@@ -194,7 +191,7 @@ namespace Nop.Web.Areas.Admin.Factories
             model.Id = product.Id;
             model.Name = string.Format(await _localizationService.GetResourceAsync("Admin.Catalog.Products.Copy.Name.New"), product.Name);
             model.Published = true;
-            model.CopyMultimedia = true;
+            model.CopyImages = true;
 
             return model;
         }
@@ -462,28 +459,6 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <param name="product">Product</param>
         /// <returns>Product picture search model</returns>
         protected virtual ProductPictureSearchModel PrepareProductPictureSearchModel(ProductPictureSearchModel searchModel, Product product)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            searchModel.ProductId = product.Id;
-
-            //prepare page parameters
-            searchModel.SetGridPageSize();
-
-            return searchModel;
-        }
-
-        /// <summary>
-        /// Prepare product video search model
-        /// </summary>
-        /// <param name="searchModel">Product video search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>Product video search model</returns>
-        protected virtual ProductVideoSearchModel PrepareProductVideoSearchModel(ProductVideoSearchModel searchModel, Product product)
         {
             if (searchModel == null)
                 throw new ArgumentNullException(nameof(searchModel));
@@ -843,7 +818,6 @@ namespace Nop.Web.Areas.Admin.Factories
                 PrepareCrossSellProductSearchModel(model.CrossSellProductSearchModel, product);
                 PrepareAssociatedProductSearchModel(model.AssociatedProductSearchModel, product);
                 PrepareProductPictureSearchModel(model.ProductPictureSearchModel, product);
-                PrepareProductVideoSearchModel(model.ProductVideoSearchModel, product);
                 PrepareProductSpecificationAttributeSearchModel(model.ProductSpecificationAttributeSearchModel, product);
                 PrepareProductOrderSearchModel(model.ProductOrderSearchModel, product);
                 PrepareTierPriceSearchModel(model.TierPriceSearchModel, product);
@@ -1477,47 +1451,6 @@ namespace Nop.Web.Areas.Admin.Factories
                     productPictureModel.OverrideTitleAttribute = picture.TitleAttribute;
 
                     return productPictureModel;
-                });
-            });
-
-            return model;
-        }
-
-        /// <summary>
-        /// Prepare paged product video list model
-        /// </summary>
-        /// <param name="searchModel">Product video search model</param>
-        /// <param name="product">Product</param>
-        /// <returns>
-        /// A task that represents the asynchronous operation
-        /// The task result contains the product video list model
-        /// </returns>
-        public virtual async Task<ProductVideoListModel> PrepareProductVideoListModelAsync(ProductVideoSearchModel searchModel, Product product)
-        {
-            if (searchModel == null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            //get product videos
-            var productVideos = (await _productService.GetProductVideosByProductIdAsync(product.Id)).ToPagedList(searchModel);
-
-            //prepare grid model
-            var model = await new ProductVideoListModel().PrepareToGridAsync(searchModel, productVideos, () =>
-            {
-                return productVideos.SelectAwait(async productVideo =>
-                {
-                    //fill in model values from the entity
-                    var productVideoModel = productVideo.ToModel<ProductVideoModel>();
-
-                    //fill in additional values (not existing in the entity)
-                    var video = (await _videoService.GetVideoByIdAsync(productVideo.VideoId))
-                        ?? throw new Exception("Video cannot be loaded");
-
-                    productVideoModel.VideoUrl = video.VideoUrl;
-
-                    return productVideoModel;
                 });
             });
 

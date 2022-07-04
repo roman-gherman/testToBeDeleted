@@ -35,48 +35,43 @@ namespace Nop.Tests.Nop.Services.Tests
 
             Singleton<IPluginsInfo>.Instance = new PluginsInfo(CommonHelper.DefaultFileProvider)
             {
-                PluginDescriptors = new List<(PluginDescriptor, bool)>
+                PluginDescriptors = new List<PluginDescriptor>
                 {
-                    (new PluginDescriptor
+                    new PluginDescriptor(typeof(FixedRateTestTaxProvider).Assembly)
                     {
                         PluginType = typeof(FixedRateTestTaxProvider),
                         SystemName = "FixedTaxRateTest",
                         FriendlyName = "Fixed tax test rate provider",
-                        Installed = true,
-                        ReferencedAssembly = typeof(FixedRateTestTaxProvider).Assembly
-                    }, true),
-                    (new PluginDescriptor
+                        Installed = true
+                    },
+                    new PluginDescriptor(typeof(FixedRateTestShippingRateComputationMethod).Assembly)
                     {
                         PluginType = typeof(FixedRateTestShippingRateComputationMethod),
                         SystemName = "FixedRateTestShippingRateComputationMethod",
                         FriendlyName = "Fixed rate test shipping computation method",
-                        Installed = true,
-                        ReferencedAssembly = typeof(FixedRateTestShippingRateComputationMethod).Assembly
-                    }, true),
-                    (new PluginDescriptor
+                        Installed = true
+                    },
+                    new PluginDescriptor(typeof(TestPaymentMethod).Assembly)
                     {
                         PluginType = typeof(TestPaymentMethod),
                         SystemName = "Payments.TestMethod",
                         FriendlyName = "Test payment method",
-                        Installed = true,
-                        ReferencedAssembly = typeof(TestPaymentMethod).Assembly
-                    }, true),
-                    (new PluginDescriptor
+                        Installed = true
+                    },
+                    new PluginDescriptor(typeof(TestDiscountRequirementRule).Assembly)
                     {
                         PluginType = typeof(TestDiscountRequirementRule),
                         SystemName = "TestDiscountRequirementRule",
                         FriendlyName = "Test discount requirement rule",
-                        Installed = true,
-                        ReferencedAssembly = typeof(TestDiscountRequirementRule).Assembly
-                    }, true),
-                    (new PluginDescriptor
+                        Installed = true
+                    },
+                    new PluginDescriptor(typeof(TestExchangeRateProvider).Assembly)
                     {
                         PluginType = typeof(TestExchangeRateProvider),
                         SystemName = "CurrencyExchange.TestProvider",
                         FriendlyName = "Test exchange rate provider",
-                        Installed = true,
-                        ReferencedAssembly = typeof(TestExchangeRateProvider).Assembly
-                    }, true)
+                        Installed = true
+                    }
                 }
             };
         }

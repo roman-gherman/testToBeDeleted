@@ -32,7 +32,7 @@ namespace Nop.Web.Framework.Themes
         /// </summary>
         /// <param name="context">Context</param>
         /// <param name="viewLocations">View locations</param>
-        /// <returns>View locations</returns>
+        /// <returns>iew locations</returns>
         public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
         {
             if (context.Values.TryGetValue(THEME_KEY, out string theme))

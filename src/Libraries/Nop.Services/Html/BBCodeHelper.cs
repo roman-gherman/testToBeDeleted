@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+﻿﻿using System.Text.RegularExpressions;
 using Nop.Core.Domain.Common;
 using Nop.Services.Html.CodeFormatter;
 
@@ -9,17 +9,9 @@ namespace Nop.Services.Html
     /// </summary>
     public partial class BBCodeHelper : IBBCodeHelper
     {
-        #region Fields
+        #region Filds
 
         private readonly CommonSettings _commonSettings;
-
-        private static readonly Regex _regexBold = new(@"\[b\](.+?)\[/b\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex _regexItalic = new(@"\[i\](.+?)\[/i\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex _regexUnderLine = new(@"\[u\](.+?)\[/u\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex _regexUrl1 = new(@"\[url\=(https?:.+?)\]([^\]]+)\[/url\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex _regexUrl2 = new(@"\[url\](https?:.+?)\[/url\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex _regexQuote = new(@"\[quote=(.+?)\](.+?)\[/quote\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex _regexImg = new(@"\[img\](.+?)\[/img\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         #endregion
 
@@ -29,6 +21,18 @@ namespace Nop.Services.Html
         {
             _commonSettings = commonSettings;
         }
+
+        #endregion
+
+        #region Fields
+
+        private static readonly Regex regexBold = new(@"\[b\](.+?)\[/b\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex regexItalic = new(@"\[i\](.+?)\[/i\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex regexUnderLine = new(@"\[u\](.+?)\[/u\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex regexUrl1 = new(@"\[url\=(https?:.+?)\]([^\]]+)\[/url\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex regexUrl2 = new(@"\[url\](https?:.+?)\[/url\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex regexQuote = new(@"\[quote=(.+?)\](.+?)\[/quote\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex regexImg = new(@"\[img\](.+?)\[/img\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         #endregion
 
@@ -53,40 +57,55 @@ namespace Nop.Services.Html
                 return string.Empty;
 
             if (replaceBold)
-                // format the bold tags: [b][/b] becomes: <strong></strong>
-                text = _regexBold.Replace(text, "<strong>$1</strong>");
+            {
+                // format the bold tags: [b][/b]
+                // becomes: <strong></strong>
+                text = regexBold.Replace(text, "<strong>$1</strong>");
+            }
 
             if (replaceItalic)
-                // format the italic tags: [i][/i] becomes: <em></em>
-                text = _regexItalic.Replace(text, "<em>$1</em>");
+            {
+                // format the italic tags: [i][/i]
+                // becomes: <em></em>
+                text = regexItalic.Replace(text, "<em>$1</em>");
+            }
 
             if (replaceUnderline)
-                // format the underline tags: [u][/u] becomes: <u></u>
-                text = _regexUnderLine.Replace(text, "<u>$1</u>");
+            {
+                // format the underline tags: [u][/u]
+                // becomes: <u></u>
+                text = regexUnderLine.Replace(text, "<u>$1</u>");
+            }
 
             if (replaceUrl)
             {
                 var newWindow = _commonSettings.BbcodeEditorOpenLinksInNewWindow;
                 // format the URL tags: [url=https://www.nopCommerce.com]my site[/url]
                 // becomes: <a href="https://www.nopCommerce.com">my site</a>
-                text = _regexUrl1.Replace(text, $"<a href=\"$1\" rel=\"nofollow\"{(newWindow ? " target=_blank" : "")}>$2</a>");
+                text = regexUrl1.Replace(text, $"<a href=\"$1\" rel=\"nofollow\"{(newWindow ? " target=_blank" : "")}>$2</a>");
 
                 // format the URL tags: [url]https://www.nopCommerce.com[/url]
                 // becomes: <a href="https://www.nopCommerce.com">https://www.nopCommerce.com</a>
-                text = _regexUrl2.Replace(text, $"<a href=\"$1\" rel=\"nofollow\"{(newWindow ? " target=_blank" : "")}>$1</a>");
+                text = regexUrl2.Replace(text, $"<a href=\"$1\" rel=\"nofollow\"{(newWindow ? " target=_blank" : "")}>$1</a>");
             }
 
             if (replaceQuote)
-                while (_regexQuote.IsMatch(text))
-                    text = _regexQuote.Replace(text, "<b>$1 wrote:</b><div class=\"quote\">$2</div>");
+            {
+                while (regexQuote.IsMatch(text))
+                    text = regexQuote.Replace(text, "<b>$1 wrote:</b><div class=\"quote\">$2</div>");
+            }
 
-            if (replaceCode) 
+            if (replaceCode)
+            {
                 text = CodeFormatHelper.FormatTextSimple(text);
+            }
 
             if (replaceImg)
+            {
                 // format the img tags: [img]https://www.nopCommerce.com/Content/Images/Image.jpg[/img]
                 // becomes: <img src="https://www.nopCommerce.com/Content/Images/Image.jpg">
-                text = _regexImg.Replace(text, "<img src=\"$1\" class=\"user-posted-image\" alt=\"\">");
+                text = regexImg.Replace(text, "<img src=\"$1\" class=\"user-posted-image\" alt=\"\">");
+            }
 
             return text;
         }

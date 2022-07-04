@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Common;
-using Nop.Web.Models.Media;
 
 namespace Nop.Web.Models.Order
 {
@@ -85,18 +84,12 @@ namespace Nop.Web.Models.Order
         public IList<OrderNote> OrderNotes { get; set; }
 
         public bool ShowVendorName { get; set; }
-        public bool ShowProductThumbnail { get; set; }
-
+        
 
         #region Nested Classes
 
         public partial record OrderItemModel : BaseNopEntityModel
         {
-            public OrderItemModel()
-            {
-                Picture = new PictureModel();
-            }
-
             public Guid OrderItemGuid { get; set; }
             public string Sku { get; set; }
             public int ProductId { get; set; }
@@ -107,7 +100,6 @@ namespace Nop.Web.Models.Order
             public string SubTotal { get; set; }
             public decimal SubTotalValue { get; set; }
             public int Quantity { get; set; }
-            public PictureModel Picture { get; set; }
             public string AttributeInfo { get; set; }
             public string RentalInfo { get; set; }
 

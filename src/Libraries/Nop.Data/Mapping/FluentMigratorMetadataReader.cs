@@ -39,7 +39,7 @@ namespace Nop.Data.Mapping
                 var entityDescriptor  = _mappingEntityAccessor.GetEntityDescriptor(type);
 
                 if (typeof(T) == typeof(TableAttribute))
-                    return new TableAttribute(entityDescriptor.EntityName) { Schema = entityDescriptor.SchemaName };
+                    return new TableAttribute(entityDescriptor.EntityName);
 
                 if (typeof(T) != typeof(ColumnAttribute))
                     return null;

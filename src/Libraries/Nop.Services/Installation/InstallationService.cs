@@ -268,7 +268,7 @@ namespace Nop.Services.Installation
             //max length
             seName = CommonHelper.EnsureMaximumLength(seName, NopSeoDefaults.SearchEngineNameLength);
 
-            //ensure this seName is not reserved yet
+            //ensure this sename is not reserved yet
             var i = 2;
             var tempSeName = seName;
             while (true)
@@ -828,13 +828,31 @@ namespace Nop.Services.Installation
 
             secondUser.BillingAddressId = defaultSecondUserAddress.Id;
             secondUser.ShippingAddressId = defaultSecondUserAddress.Id;
-            secondUser.FirstName = defaultSecondUserAddress.FirstName;
-            secondUser.LastName = defaultSecondUserAddress.LastName;
 
             await InsertInstallationDataAsync(secondUser);
 
             await InsertInstallationDataAsync(new CustomerAddressMapping { CustomerId = secondUser.Id, AddressId = defaultSecondUserAddress.Id });
             await InsertInstallationDataAsync(new CustomerCustomerRoleMapping { CustomerId = secondUser.Id, CustomerRoleId = crRegistered.Id });
+
+            //set default customer name
+            await InsertInstallationDataAsync(new GenericAttribute
+            {
+                EntityId = secondUser.Id,
+                Key = NopCustomerDefaults.FirstNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultSecondUserAddress.FirstName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            },
+            new GenericAttribute
+            {
+                EntityId = secondUser.Id,
+                Key = NopCustomerDefaults.LastNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultSecondUserAddress.LastName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            });
 
             //set customer password
             await InsertInstallationDataAsync(new CustomerPassword
@@ -878,13 +896,31 @@ namespace Nop.Services.Installation
 
             thirdUser.BillingAddressId = defaultThirdUserAddress.Id;
             thirdUser.ShippingAddressId = defaultThirdUserAddress.Id;
-            thirdUser.FirstName = defaultThirdUserAddress.FirstName;
-            thirdUser.LastName = defaultThirdUserAddress.LastName;
 
             await InsertInstallationDataAsync(thirdUser);
 
             await InsertInstallationDataAsync(new CustomerAddressMapping { CustomerId = thirdUser.Id, AddressId = defaultThirdUserAddress.Id });
             await InsertInstallationDataAsync(new CustomerCustomerRoleMapping { CustomerId = thirdUser.Id, CustomerRoleId = crRegistered.Id });
+
+            //set default customer name
+            await InsertInstallationDataAsync(new GenericAttribute
+            {
+                EntityId = thirdUser.Id,
+                Key = NopCustomerDefaults.FirstNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultThirdUserAddress.FirstName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            },
+            new GenericAttribute
+            {
+                EntityId = thirdUser.Id,
+                Key = NopCustomerDefaults.LastNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultThirdUserAddress.LastName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            });
 
             //set customer password
             await InsertInstallationDataAsync(new CustomerPassword
@@ -927,13 +963,31 @@ namespace Nop.Services.Installation
 
             fourthUser.BillingAddressId = defaultFourthUserAddress.Id;
             fourthUser.ShippingAddressId = defaultFourthUserAddress.Id;
-            fourthUser.FirstName = defaultFourthUserAddress.FirstName;
-            fourthUser.LastName = defaultFourthUserAddress.LastName;
 
             await InsertInstallationDataAsync(fourthUser);
 
             await InsertInstallationDataAsync(new CustomerAddressMapping { CustomerId = fourthUser.Id, AddressId = defaultFourthUserAddress.Id });
             await InsertInstallationDataAsync(new CustomerCustomerRoleMapping { CustomerId = fourthUser.Id, CustomerRoleId = crRegistered.Id });
+
+            //set default customer name
+            await InsertInstallationDataAsync(new GenericAttribute
+            {
+                EntityId = fourthUser.Id,
+                Key = NopCustomerDefaults.FirstNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultFourthUserAddress.FirstName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            },
+            new GenericAttribute
+            {
+                EntityId = fourthUser.Id,
+                Key = NopCustomerDefaults.LastNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultFourthUserAddress.LastName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            });
 
             //set customer password
             await InsertInstallationDataAsync(new CustomerPassword
@@ -977,13 +1031,31 @@ namespace Nop.Services.Installation
 
             fifthUser.BillingAddressId = defaultFifthUserAddress.Id;
             fifthUser.ShippingAddressId = defaultFifthUserAddress.Id;
-            fifthUser.FirstName = defaultFifthUserAddress.FirstName;
-            fifthUser.LastName = defaultFifthUserAddress.LastName;
 
             await InsertInstallationDataAsync(fifthUser);
 
             await InsertInstallationDataAsync(new CustomerAddressMapping { CustomerId = fifthUser.Id, AddressId = defaultFifthUserAddress.Id });
             await InsertInstallationDataAsync(new CustomerCustomerRoleMapping { CustomerId = fifthUser.Id, CustomerRoleId = crRegistered.Id });
+
+            //set default customer name
+            await InsertInstallationDataAsync(new GenericAttribute
+            {
+                EntityId = fifthUser.Id,
+                Key = NopCustomerDefaults.FirstNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultFifthUserAddress.FirstName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            },
+            new GenericAttribute
+            {
+                EntityId = fifthUser.Id,
+                Key = NopCustomerDefaults.LastNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultFifthUserAddress.LastName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            });
 
             //set customer password
             await InsertInstallationDataAsync(new CustomerPassword
@@ -1027,13 +1099,31 @@ namespace Nop.Services.Installation
 
             sixthUser.BillingAddressId = defaultSixthUserAddress.Id;
             sixthUser.ShippingAddressId = defaultSixthUserAddress.Id;
-            sixthUser.FirstName = defaultSixthUserAddress.FirstName;
-            sixthUser.LastName = defaultSixthUserAddress.LastName;
 
             await InsertInstallationDataAsync(sixthUser);
 
             await InsertInstallationDataAsync(new CustomerAddressMapping { CustomerId = sixthUser.Id, AddressId = defaultSixthUserAddress.Id });
             await InsertInstallationDataAsync(new CustomerCustomerRoleMapping { CustomerId = sixthUser.Id, CustomerRoleId = crRegistered.Id });
+
+            //set default customer name
+            await InsertInstallationDataAsync(new GenericAttribute
+            {
+                EntityId = sixthUser.Id,
+                Key = NopCustomerDefaults.FirstNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultSixthUserAddress.FirstName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            },
+            new GenericAttribute
+            {
+                EntityId = sixthUser.Id,
+                Key = NopCustomerDefaults.LastNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = defaultSixthUserAddress.LastName,
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            });
 
             //set customer password
             await InsertInstallationDataAsync(new CustomerPassword
@@ -1135,8 +1225,6 @@ namespace Nop.Services.Installation
 
             adminUser.BillingAddressId = defaultAdminUserAddress.Id;
             adminUser.ShippingAddressId = defaultAdminUserAddress.Id;
-            adminUser.FirstName = defaultAdminUserAddress.FirstName;
-            adminUser.LastName = defaultAdminUserAddress.LastName;
 
             await InsertInstallationDataAsync(adminUser);
 
@@ -1146,6 +1234,26 @@ namespace Nop.Services.Installation
                 new CustomerCustomerRoleMapping { CustomerId = adminUser.Id, CustomerRoleId = crAdministrators.Id },
                 new CustomerCustomerRoleMapping { CustomerId = adminUser.Id, CustomerRoleId = crForumModerators.Id },
                 new CustomerCustomerRoleMapping { CustomerId = adminUser.Id, CustomerRoleId = crRegistered.Id });
+
+            //set default customer name
+            await InsertInstallationDataAsync(new GenericAttribute
+            {
+                EntityId = adminUser.Id,
+                Key = NopCustomerDefaults.FirstNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = "John",
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            },
+            new GenericAttribute
+            {
+                EntityId = adminUser.Id,
+                Key = NopCustomerDefaults.LastNameAttribute,
+                KeyGroup = nameof(Customer),
+                Value = "Smith",
+                StoreId = 0,
+                CreatedOrUpdatedDateUTC = DateTime.UtcNow
+            });
 
             //set hashed admin password
             var customerRegistrationService = EngineContext.Current.Resolve<ICustomerRegistrationService>();
@@ -2785,6 +2893,7 @@ namespace Nop.Services.Installation
             await settingService.SaveSettingAsync(new CommonSettings
             {
                 UseSystemEmailForContactUsForm = true,
+
                 DisplayJavaScriptDisabledWarning = false,
                 Log404Errors = true,
                 BreadcrumbDelimiter = "/",
@@ -2792,12 +2901,9 @@ namespace Nop.Services.Installation
                 PopupForTermsOfServiceLinks = true,
                 JqueryMigrateScriptLoggingActive = false,
                 UseResponseCompression = true,
-                FaviconAndAppIconsHeadCode =
-                    "<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/icons/icons_0/apple-touch-icon.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/icons/icons_0/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"192x192\" href=\"/icons/icons_0/android-chrome-192x192.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/icons/icons_0/favicon-16x16.png\"><link rel=\"manifest\" href=\"/icons/icons_0/site.webmanifest\"><link rel=\"mask-icon\" href=\"/icons/icons_0/safari-pinned-tab.svg\" color=\"#5bbad5\"><link rel=\"shortcut icon\" href=\"/icons/icons_0/favicon.ico\"><meta name=\"msapplication-TileColor\" content=\"#2d89ef\"><meta name=\"msapplication-TileImage\" content=\"/icons/icons_0/mstile-144x144.png\"><meta name=\"msapplication-config\" content=\"/icons/icons_0/browserconfig.xml\"><meta name=\"theme-color\" content=\"#ffffff\">",
+                FaviconAndAppIconsHeadCode = "<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/icons/icons_0/apple-touch-icon.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/icons/icons_0/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"192x192\" href=\"/icons/icons_0/android-chrome-192x192.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/icons/icons_0/favicon-16x16.png\"><link rel=\"manifest\" href=\"/icons/icons_0/site.webmanifest\"><link rel=\"mask-icon\" href=\"/icons/icons_0/safari-pinned-tab.svg\" color=\"#5bbad5\"><link rel=\"shortcut icon\" href=\"/icons/icons_0/favicon.ico\"><meta name=\"msapplication-TileColor\" content=\"#2d89ef\"><meta name=\"msapplication-TileImage\" content=\"/icons/icons_0/mstile-144x144.png\"><meta name=\"msapplication-config\" content=\"/icons/icons_0/browserconfig.xml\"><meta name=\"theme-color\" content=\"#ffffff\">",
                 EnableHtmlMinification = true,
-                RestartTimeout = NopCommonDefaults.RestartTimeout,
-                HeaderCustomHtml = string.Empty,
-                FooterCustomHtml = string.Empty
+                RestartTimeout = NopCommonDefaults.RestartTimeout
             });
 
             await settingService.SaveSettingAsync(new SeoSettings
@@ -2848,7 +2954,6 @@ namespace Nop.Services.Installation
 
             await settingService.SaveSettingAsync(new GdprSettings
             {
-                DeleteInactiveCustomersAfterMonths = 36,
                 GdprEnabled = false,
                 LogPrivacyPolicyConsent = true,
                 LogNewsletterConsent = true,
@@ -2865,7 +2970,6 @@ namespace Nop.Services.Installation
                 ShowManufacturerPartNumber = false,
                 ShowGtin = false,
                 ShowFreeShippingNotification = true,
-                ShowShortDescriptionOnCatalogPages = false,
                 AllowProductSorting = true,
                 AllowProductViewModeChanging = true,
                 DefaultViewMode = "grid",
@@ -2874,8 +2978,7 @@ namespace Nop.Services.Installation
                 ShowCategoryProductNumberIncludingSubcategories = false,
                 CategoryBreadcrumbEnabled = true,
                 ShowShareButton = true,
-                PageShareCode =
-                    "<!-- AddThis Button BEGIN --><div class=\"addthis_toolbox addthis_default_style \"><a class=\"addthis_button_preferred_1\"></a><a class=\"addthis_button_preferred_2\"></a><a class=\"addthis_button_preferred_3\"></a><a class=\"addthis_button_preferred_4\"></a><a class=\"addthis_button_compact\"></a><a class=\"addthis_counter addthis_bubble_style\"></a></div><script src=\"http://s7.addthis.com/js/250/addthis_widget.js#pubid=nopsolutions\"></script><!-- AddThis Button END -->",
+                PageShareCode = "<!-- AddThis Button BEGIN --><div class=\"addthis_toolbox addthis_default_style \"><a class=\"addthis_button_preferred_1\"></a><a class=\"addthis_button_preferred_2\"></a><a class=\"addthis_button_preferred_3\"></a><a class=\"addthis_button_preferred_4\"></a><a class=\"addthis_button_compact\"></a><a class=\"addthis_counter addthis_bubble_style\"></a></div><script src=\"http://s7.addthis.com/js/250/addthis_widget.js#pubid=nopsolutions\"></script><!-- AddThis Button END -->",
                 ProductReviewsMustBeApproved = false,
                 OneReviewPerProductFromCustomer = false,
                 DefaultProductRatingValue = 5,
@@ -2887,10 +2990,8 @@ namespace Nop.Services.Installation
                 AllowAnonymousUsersToEmailAFriend = false,
                 RecentlyViewedProductsNumber = 3,
                 RecentlyViewedProductsEnabled = true,
+                NewProductsNumber = 6,
                 NewProductsEnabled = true,
-                NewProductsPageSize = 6,
-                NewProductsAllowCustomersToSelectPageSize = true,
-                NewProductsPageSizeOptions = "6, 3, 9",
                 CompareProductsEnabled = true,
                 CompareProductsNumber = 4,
                 ProductSearchAutoCompleteEnabled = true,
@@ -2956,19 +3057,12 @@ namespace Nop.Services.Installation
                 EnableManufacturerFiltering = true,
                 EnablePriceRangeFiltering = true,
                 EnableSpecificationAttributeFiltering = true,
-                DisplayFromPrices = false,
-                AttributeValueOutOfStockDisplayType = AttributeValueOutOfStockDisplayType.AlwaysDisplay,
-                AllowCustomersToSearchWithCategoryName = true,
-                AllowCustomersToSearchWithManufacturerName = true,
-                DisplayAllPicturesOnCatalogPages = false,
-                ProductUrlStructureTypeId = (int)ProductUrlStructureType.Product
+                AttributeValueOutOfStockDisplayType = AttributeValueOutOfStockDisplayType.AlwaysDisplay
             });
 
             await settingService.SaveSettingAsync(new LocalizationSettings
             {
-                DefaultAdminLanguageId =
-                    _languageRepository.Table
-                        .Single(l => l.LanguageCulture == NopCommonDefaults.DefaultLanguageCulture).Id,
+                DefaultAdminLanguageId = _languageRepository.Table.Single(l => l.LanguageCulture == NopCommonDefaults.DefaultLanguageCulture).Id,
                 UseImagesForLanguageSelection = false,
                 SeoFriendlyUrlsForLanguagesEnabled = false,
                 AutomaticallyDetectLanguage = false,
@@ -3082,7 +3176,6 @@ namespace Nop.Services.Installation
                 ManufacturerThumbPictureSize = 420,
                 VendorThumbPictureSize = 450,
                 CartThumbPictureSize = 80,
-                OrderThumbPictureSize = 80,
                 MiniCartThumbPictureSize = 70,
                 AutoCompleteSearchThumbPictureSize = 20,
                 ImageSquarePictureSize = 32,
@@ -3092,10 +3185,7 @@ namespace Nop.Services.Installation
                 MultipleThumbDirectories = false,
                 ImportProductImagesUsingHash = true,
                 AzureCacheControlHeader = string.Empty,
-                UseAbsoluteImagePath = true,
-                VideoIframeAllow = "fullscreen",
-                VideoIframeWidth = 300,
-                VideoIframeHeight = 150
+                UseAbsoluteImagePath = true
             });
 
             await settingService.SaveSettingAsync(new StoreInformationSettings
@@ -3107,13 +3197,14 @@ namespace Nop.Services.Installation
                 FacebookLink = "https://www.facebook.com/nopCommerce",
                 TwitterLink = "https://twitter.com/nopCommerce",
                 YoutubeLink = "https://www.youtube.com/user/nopCommerce",
-                InstagramLink = "https://www.instagram.com/nopcommerce_official",
                 HidePoweredByNopCommerce = false
             });
 
             await settingService.SaveSettingAsync(new ExternalAuthenticationSettings
             {
-                RequireEmailValidation = false, LogErrors = false, AllowCustomersToRemoveAssociations = true
+                RequireEmailValidation = false,
+                LogErrors = false,
+                AllowCustomersToRemoveAssociations = true
             });
 
             await settingService.SaveSettingAsync(new RewardPointsSettings
@@ -3139,10 +3230,8 @@ namespace Nop.Services.Installation
             await settingService.SaveSettingAsync(new CurrencySettings
             {
                 DisplayCurrencyLabel = false,
-                PrimaryStoreCurrencyId =
-                    _currencyRepository.Table.Single(c => c.CurrencyCode == primaryCurrency).Id,
-                PrimaryExchangeRateCurrencyId =
-                    _currencyRepository.Table.Single(c => c.CurrencyCode == primaryCurrency).Id,
+                PrimaryStoreCurrencyId = _currencyRepository.Table.Single(c => c.CurrencyCode == primaryCurrency).Id,
+                PrimaryExchangeRateCurrencyId = _currencyRepository.Table.Single(c => c.CurrencyCode == primaryCurrency).Id,
                 ActiveExchangeRateProviderSystemName = "CurrencyExchange.ECB",
                 AutoUpdateEnabled = false
             });
@@ -3152,14 +3241,16 @@ namespace Nop.Services.Installation
 
             await settingService.SaveSettingAsync(new MeasureSettings
             {
-                BaseDimensionId =
-                    _measureDimensionRepository.Table.Single(m => m.SystemKeyword == baseDimension).Id,
+                BaseDimensionId = _measureDimensionRepository.Table.Single(m => m.SystemKeyword == baseDimension).Id,
                 BaseWeightId = _measureWeightRepository.Table.Single(m => m.SystemKeyword == baseWeight).Id
             });
 
             await settingService.SaveSettingAsync(new MessageTemplatesSettings
             {
-                CaseInvariantReplacement = false, Color1 = "#b9babe", Color2 = "#ebecee", Color3 = "#dde2e6"
+                CaseInvariantReplacement = false,
+                Color1 = "#b9babe",
+                Color2 = "#ebecee",
+                Color3 = "#dde2e6"
             });
 
             await settingService.SaveSettingAsync(new ShoppingCartSettings
@@ -3219,7 +3310,6 @@ namespace Nop.Services.Installation
                 CustomOrderNumberMask = "{ID}",
                 ExportWithProducts = true,
                 AllowAdminsToBuyCallForPriceProducts = true,
-                ShowProductThumbnailInOrderDetailsPage = true,
                 DisplayCustomerCurrencyOnOrders = false,
                 DisplayOrderSummary = true
             });
@@ -3263,7 +3353,11 @@ namespace Nop.Services.Installation
 
             await settingService.SaveSettingAsync(new PaymentSettings
             {
-                ActivePaymentMethodSystemNames = new List<string> { "Payments.CheckMoneyOrder", "Payments.Manual" },
+                ActivePaymentMethodSystemNames = new List<string>
+                    {
+                        "Payments.CheckMoneyOrder",
+                        "Payments.Manual"
+                    },
                 AllowRePostingPayments = true,
                 BypassPaymentMethodSelectionIfOnlyOne = true,
                 ShowPaymentMethodDescriptions = true,
@@ -3294,10 +3388,7 @@ namespace Nop.Services.Installation
                 PaymentMethodAdditionalFeeIncludesTax = false,
                 PaymentMethodAdditionalFeeTaxClassId = 0,
                 EuVatEnabled = isEurope,
-                EuVatShopCountryId =
-                    isEurope
-                        ? (_countryRepository.Table.FirstOrDefault(x => x.TwoLetterIsoCode == country)?.Id ?? 0)
-                        : 0,
+                EuVatShopCountryId = isEurope ? (_countryRepository.Table.FirstOrDefault(x => x.TwoLetterIsoCode == country)?.Id ?? 0) : 0,
                 EuVatAllowVatExemption = true,
                 EuVatUseWebService = false,
                 EuVatAssumeValid = false,
@@ -3307,7 +3398,8 @@ namespace Nop.Services.Installation
 
             await settingService.SaveSettingAsync(new DateTimeSettings
             {
-                DefaultStoreTimeZoneId = string.Empty, AllowCustomersToSetTimeZone = false
+                DefaultStoreTimeZoneId = string.Empty,
+                AllowCustomersToSetTimeZone = false
             });
 
             await settingService.SaveSettingAsync(new BlogSettings
@@ -3388,7 +3480,10 @@ namespace Nop.Services.Installation
             var eaGeneral = _emailAccountRepository.Table.FirstOrDefault();
             if (eaGeneral == null)
                 throw new Exception("Default email account cannot be loaded");
-            await settingService.SaveSettingAsync(new EmailAccountSettings { DefaultEmailAccountId = eaGeneral.Id });
+            await settingService.SaveSettingAsync(new EmailAccountSettings
+            {
+                DefaultEmailAccountId = eaGeneral.Id
+            });
 
             await settingService.SaveSettingAsync(new WidgetSettings
             {
@@ -3448,10 +3543,12 @@ namespace Nop.Services.Installation
                 ShowOnNewsCommentPage = false,
                 ShowOnProductReviewPage = false,
                 ShowOnRegistrationPage = false,
-                ShowOnCheckoutPageForGuests = false,
             });
 
-            await settingService.SaveSettingAsync(new MessagesSettings { UsePopupNotifications = false });
+            await settingService.SaveSettingAsync(new MessagesSettings
+            {
+                UsePopupNotifications = false
+            });
 
             await settingService.SaveSettingAsync(new ProxySettings
             {
@@ -3469,87 +3566,6 @@ namespace Nop.Services.Installation
                 CompareProductsCookieExpires = 24 * 10,
                 RecentlyViewedProductsCookieExpires = 24 * 10,
                 CustomerCookieExpires = 24 * 365
-            });
-
-            await settingService.SaveSettingAsync(new RobotsTxtSettings
-            {
-                DisallowPaths = new List<string>
-                {
-                    "/admin",
-                    "/bin/",
-                    "/files/",
-                    "/files/exportimport/",
-                    "/country/getstatesbycountryid",
-                    "/install",
-                    "/setproductreviewhelpfulness",
-                    "/*?*returnUrl="
-                },
-                LocalizableDisallowPaths = new List<string>
-                {
-                    "/addproducttocart/catalog/",
-                    "/addproducttocart/details/",
-                    "/backinstocksubscriptions/manage",
-                    "/boards/forumsubscriptions",
-                    "/boards/forumwatch",
-                    "/boards/postedit",
-                    "/boards/postdelete",
-                    "/boards/postcreate",
-                    "/boards/topicedit",
-                    "/boards/topicdelete",
-                    "/boards/topiccreate",
-                    "/boards/topicmove",
-                    "/boards/topicwatch",
-                    "/cart$",
-                    "/changecurrency",
-                    "/changelanguage",
-                    "/changetaxtype",
-                    "/checkout",
-                    "/checkout/billingaddress",
-                    "/checkout/completed",
-                    "/checkout/confirm",
-                    "/checkout/shippingaddress",
-                    "/checkout/shippingmethod",
-                    "/checkout/paymentinfo",
-                    "/checkout/paymentmethod",
-                    "/clearcomparelist",
-                    "/compareproducts",
-                    "/compareproducts/add/*",
-                    "/customer/avatar",
-                    "/customer/activation",
-                    "/customer/addresses",
-                    "/customer/changepassword",
-                    "/customer/checkusernameavailability",
-                    "/customer/downloadableproducts",
-                    "/customer/info",
-                    "/customer/productreviews",
-                    "/deletepm",
-                    "/emailwishlist",
-                    "/eucookielawaccept",
-                    "/inboxupdate",
-                    "/newsletter/subscriptionactivation",
-                    "/onepagecheckout",
-                    "/order/history",
-                    "/orderdetails",
-                    "/passwordrecovery/confirm",
-                    "/poll/vote",
-                    "/privatemessages",
-                    "/recentlyviewedproducts",
-                    "/returnrequest",
-                    "/returnrequest/history",
-                    "/rewardpoints/history",
-                    "/search?",
-                    "/sendpm",
-                    "/sentupdate",
-                    "/shoppingcart/*",
-                    "/storeclosed",
-                    "/subscribenewsletter",
-                    "/topic/authenticate",
-                    "/viewpm",
-                    "/uploadfilecheckoutattribute",
-                    "/uploadfileproductattribute",
-                    "/uploadfilereturnrequest",
-                    "/wishlist"
-                }
             });
         }
 
@@ -8889,57 +8905,9 @@ namespace Nop.Services.Installation
                 },
                 new ActivityLogType
                 {
-                    SystemKeyword = "ImportNewsLetterSubscriptions",
-                    Enabled = true,
-                    Name = "Newsletter subscriptions were imported"
-                },
-                new ActivityLogType
-                {
                     SystemKeyword = "ImportStates",
                     Enabled = true,
                     Name = "States were imported"
-                },
-                new ActivityLogType
-                {
-                    SystemKeyword = "ExportCustomers",
-                    Enabled = true,
-                    Name = "Customers were exported"
-                },
-                new ActivityLogType
-                {
-                    SystemKeyword = "ExportCategories",
-                    Enabled = true,
-                    Name = "Categories were exported"
-                },
-                new ActivityLogType
-                {
-                    SystemKeyword = "ExportManufacturers",
-                    Enabled = true,
-                    Name = "Manufacturers were exported"
-                },
-                new ActivityLogType
-                {
-                    SystemKeyword = "ExportProducts",
-                    Enabled = true,
-                    Name = "Products were exported"
-                },
-                new ActivityLogType
-                {
-                    SystemKeyword = "ExportOrders",
-                    Enabled = true,
-                    Name = "Orders were exported"
-                },
-                new ActivityLogType
-                {
-                    SystemKeyword = "ExportStates",
-                    Enabled = true,
-                    Name = "States were exported"
-                },
-                new ActivityLogType
-                {
-                    SystemKeyword = "ExportNewsLetterSubscriptions",
-                    Enabled = true,
-                    Name = "Newsletter subscriptions were exported"
                 },
                 new ActivityLogType
                 {
@@ -9227,15 +9195,6 @@ namespace Nop.Services.Installation
                     Type = "Nop.Services.Directory.UpdateExchangeRateTask, Nop.Services",
                     Enabled = true,
                     LastEnabledUtc = lastEnabledUtc,
-                    StopOnError = false
-                },
-                new ScheduleTask
-                {
-                    Name = "Delete inactive customers (GDPR)",
-                    //24 hours
-                    Seconds = 86400,
-                    Type = "Nop.Services.Gdpr.DeleteInactiveCustomersTask, Nop.Services",
-                    Enabled = false,
                     StopOnError = false
                 }
             };

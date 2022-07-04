@@ -27,16 +27,15 @@ namespace Nop.Tests.Nop.Web.Tests
 
             Singleton<IPluginsInfo>.Instance = new PluginsInfo(CommonHelper.DefaultFileProvider)
             {
-                PluginDescriptors = new List<(PluginDescriptor, bool)>
+                PluginDescriptors = new List<PluginDescriptor>
                 {
-                    (new PluginDescriptor
+                    new PluginDescriptor(typeof(TestWidgetPlugin).Assembly)
                     {
                         PluginType = typeof(TestWidgetPlugin),
                         SystemName = "TestWidgetPlugin",
                         FriendlyName = "Test widget plugin",
-                        Installed = true,
-                        ReferencedAssembly = typeof(TestWidgetPlugin).Assembly
-                    }, true)
+                        Installed = true
+                    }
                 }
             };
         }

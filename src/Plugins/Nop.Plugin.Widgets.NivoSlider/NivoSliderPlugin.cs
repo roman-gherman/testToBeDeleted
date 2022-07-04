@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nop.Core;
 using Nop.Core.Infrastructure;
-using Nop.Plugin.Widgets.NivoSlider.Components;
 using Nop.Services.Cms;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
@@ -62,9 +60,9 @@ namespace Nop.Plugin.Widgets.NivoSlider
         /// </summary>
         /// <param name="widgetZone">Name of the widget zone</param>
         /// <returns>View component name</returns>
-        public Type GetWidgetViewComponent(string widgetZone)
+        public string GetWidgetViewComponentName(string widgetZone)
         {
-            return typeof(WidgetsNivoSliderViewComponent);
+            return "WidgetsNivoSlider";
         }
 
         /// <summary>

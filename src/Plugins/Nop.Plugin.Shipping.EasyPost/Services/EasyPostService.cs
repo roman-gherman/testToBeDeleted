@@ -417,19 +417,17 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 options.currency = EasyPostDefaults.CurrencyCode;
 
             //create shipment
-            var shipmentParameters = new Dictionary<string, object>()
+            var shipment = new Shipment
             {
-                { "to_address", addressTo },
-                { "from_address", addressFrom },
-                { "parcel", parcel },
-                { "customs_info", customsInfo },
-                { "options", options },
+                to_address = addressTo,
+                from_address = addressFrom,
+                parcel = parcel,
+                customs_info = customsInfo,
+                options = options
             };
-
             if (!_easyPostSettings.UseSandbox && !_easyPostSettings.UseAllAvailableCarriers)
-                shipmentParameters.Add("carrier_accounts", _easyPostSettings.CarrierAccounts?.Select(value => new CarrierAccount { id = value }).ToList());
-
-            var shipment = await Shipment.Create(shipmentParameters);
+                shipment.carrier_accounts = _easyPostSettings.CarrierAccounts?.Select(value => new CarrierAccount { id = value }).ToList();
+            shipment.Create();
 
             //log warning messages if any
             if (_easyPostSettings.LogShipmentMessages && shipment.messages?.Any() == true)
@@ -515,10 +513,10 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
         /// </returns>
         public async Task<(List<CarrierAccount> Accounts, string error)> GetCarrierAccountsAsync()
         {
-            return await HandleFunctionAsync(async () =>
+            return await HandleFunctionAsync(() =>
             {
                 //no need to log configuration errors here
-                return IsConfigured() ? await CarrierAccount.All() : new List<CarrierAccount>();
+                return Task.FromResult(IsConfigured() ? CarrierAccount.List() : new List<CarrierAccount>());
             });
         }
 
@@ -586,13 +584,13 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 var url = $"{store.Url.TrimEnd('/')}{urlHelper.RouteUrl(EasyPostDefaults.WebhookRouteName)}".ToLowerInvariant();
 
                 //check whether the webhook already exists
-                var webhook = (await Webhook.All())
+                var webhook = Webhook.List()
                     ?.FirstOrDefault(webhook => webhook.url?.Equals(url, StringComparison.InvariantCultureIgnoreCase) ?? false);
                 if (webhook is not null)
                     return webhook;
 
                 //try to create new one if doesn't exist
-                return await Webhook.Create(new() { [nameof(url)] = url })
+                return Webhook.Create(new() { [nameof(url)] = url })
                     ?? throw new NopException("No response from the service");
             });
         }
@@ -603,21 +601,21 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task DeleteWebhookAsync()
         {
-            await HandleFunctionAsync(async () =>
+            await HandleFunctionAsync(() =>
             {
                 //no need to log configuration errors here
                 if (!IsConfigured())
-                    return false;
+                    return Task.FromResult(false);
 
                 var url = _easyPostSettings.WebhookUrl;
                 if (string.IsNullOrEmpty(url))
-                    return false;
+                    return Task.FromResult(false);
 
-                var webhook = (await Webhook.All())
-                    ?.FirstOrDefault(webhook => webhook.url?.Equals(url, StringComparison.InvariantCultureIgnoreCase) ?? false);
-                var deleteResult = webhook is not null && await webhook.Delete();
+                Webhook.List()
+                    ?.FirstOrDefault(webhook => webhook.url?.Equals(url, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                    ?.Destroy();
 
-                return deleteResult;
+                return Task.FromResult(true);
             });
         }
 
@@ -641,7 +639,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(_easyPostSettings.WebhookUrl))
                     throw new NopException("Webhook is not set");
 
-                var webhook = (await Webhook.All())
+                var webhook = Webhook.List()
                     ?.FirstOrDefault(webhook => webhook.url?.Equals(_easyPostSettings.WebhookUrl, StringComparison.InvariantCultureIgnoreCase) ?? false)
                     ?? throw new NopException($"No webhook configured for URL '{_easyPostSettings.WebhookUrl}'");
 
@@ -808,7 +806,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(shipmentId))
                     throw new NopException($"Shipment for the order '{order.CustomOrderNumber}' is not found");
 
-                var orderShipment = await Shipment.Retrieve(shipmentId)
+                var orderShipment = Shipment.Retrieve(shipmentId)
                     ?? throw new NopException("No response from the service");
 
                 if (orderShipment.to_address is null || orderShipment.from_address is null || orderShipment.parcel is null)
@@ -843,7 +841,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
         /// </returns>
         public async Task<(Shipment Shipment, string Error)> GetShipmentAsync(string shipmentId)
         {
-            return await HandleFunctionAsync(async () =>
+            return await HandleFunctionAsync(() =>
             {
                 if (!IsConfigured())
                     throw new NopException("Plugin not configured");
@@ -851,10 +849,10 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(shipmentId))
                     throw new NopException("Shipment id is not set");
 
-                var shipment = await Shipment.Retrieve(shipmentId)
+                var shipment = Shipment.Retrieve(shipmentId)
                     ?? throw new NopException("No response from the service");
 
-                return shipment;
+                return Task.FromResult(shipment);
             });
         }
 
@@ -906,9 +904,9 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (!useSmartRates || !_easyPostSettings.UseSmartRates)
                     return rates;
 
-                await HandleFunctionAsync(async () =>
+                await HandleFunctionAsync(() =>
                 {
-                    var smartRates = await shipment.GetSmartrates();
+                    var smartRates = shipment.GetSmartrates();
                     if (!smartRates?.Any() ?? true)
                         throw new NopException("Failed to get smart rates");
 
@@ -929,7 +927,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                         }
                     }
 
-                    return rates;
+                    return Task.FromResult(rates);
                 });
 
                 return rates;
@@ -960,7 +958,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(shipmentId))
                     throw new NopException($"Shipment '#{shipmentEntry.Id}'is not found");
 
-                var shipment = await Shipment.Retrieve(shipmentId)
+                var shipment = Shipment.Retrieve(shipmentId)
                     ?? throw new NopException("No response from the service");
 
                 if (shipment.to_address is null || shipment.from_address is null || shipment.parcel is null)
@@ -1093,7 +1091,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(rateId))
                     throw new NopException($"Rate is not selected");
 
-                var shipment = await Shipment.Retrieve(shipmentId)
+                var shipment = Shipment.Retrieve(shipmentId)
                     ?? throw new NopException("No response from the service");
 
                 //whether the shipment has already been created and purchased
@@ -1118,7 +1116,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                     insuranceValue = insurance.ToString("0.00", CultureInfo.InvariantCulture);
                 }
 
-                await shipment.Buy(rateId, insuranceValue);
+                shipment.Buy(rateId, insuranceValue);
 
                 //set tracking number
                 if (!string.IsNullOrEmpty(shipment.tracker?.tracking_code))
@@ -1157,7 +1155,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
 
                 var format = labelFormat ?? "png";
 
-                var shipment = await Shipment.Retrieve(shipmentId)
+                var shipment = Shipment.Retrieve(shipmentId)
                     ?? throw new NopException("No response from the service");
 
                 (string DownloadUrl, string ContentType) getLabelDetails() =>
@@ -1180,7 +1178,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(type))
                 {
                     //or generate new one with the specified format
-                    await shipment.GenerateLabel(format.ToUpper());
+                    shipment.GenerateLabel(format.ToUpper());
                     (url, type) = getLabelDetails();
                 }
 
@@ -1210,7 +1208,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(shipmentId))
                     throw new NopException("Shipment is not yet purchased");
 
-                var shipment = await Shipment.Retrieve(shipmentId)
+                var shipment = Shipment.Retrieve(shipmentId)
                     ?? throw new NopException("No response from the service");
 
                 //try to get a commercial invoice from the shipment forms
@@ -1274,10 +1272,10 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                         //no need to log errors here
                         try
                         {
-                            var shipment = await Shipment.Retrieve(shipmentId);
+                            var shipment = Shipment.Retrieve(shipmentId);
                             if (!string.IsNullOrEmpty(shipment?.tracker?.id))
                             {
-                                var shipmentTracker = await Tracker.Retrieve(shipment.tracker.id);
+                                var shipmentTracker = Tracker.Retrieve(shipment.tracker.id);
                                 if (!string.IsNullOrEmpty(shipmentTracker?.public_url))
                                     return shipmentTracker.public_url;
                             }
@@ -1287,7 +1285,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 }
 
                 //or find one by the number from the common list
-                var trackerList = await Tracker.All(new() { ["tracking_code"] = trackingNumber })
+                var trackerList = Tracker.List(new() { ["tracking_code"] = trackingNumber })
                     ?? throw new NopException("No response from the service");
 
                 return trackerList.trackers?.FirstOrDefault()?.public_url
@@ -1333,10 +1331,10 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                         //no need to log errors here
                         try
                         {
-                            var shipment = await Shipment.Retrieve(shipmentId);
+                            var shipment = Shipment.Retrieve(shipmentId);
                             if (!string.IsNullOrEmpty(shipment?.tracker?.id))
                             {
-                                var shipmentTracker = await Tracker.Retrieve(shipment.tracker.id);
+                                var shipmentTracker = Tracker.Retrieve(shipment.tracker.id);
                                 if (shipmentTracker?.tracking_details?.Any() ?? false)
                                     return getEvents(shipmentTracker);
                             }
@@ -1346,7 +1344,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 }
 
                 //or find one by the number from the common list
-                var trackerList = await Tracker.All(new() { ["tracking_code"] = trackingNumber })
+                var trackerList = Tracker.List(new() { ["tracking_code"] = trackingNumber })
                     ?? throw new NopException("No response from the service");
 
                 return getEvents(trackerList.trackers?.FirstOrDefault())
@@ -1383,7 +1381,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                     if (string.IsNullOrEmpty(shipmentId))
                         throw new NopException("Shipment is not yet purchased");
 
-                    shipment = await Shipment.Retrieve(shipmentId)
+                    shipment = Shipment.Retrieve(shipmentId)
                         ?? throw new NopException("No response from the service");
                 }
 
@@ -1393,7 +1391,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                     if (string.IsNullOrEmpty(batchEntry.BatchId))
                         throw new NopException("Batch is not yet purchased");
 
-                    batch = await Batch.Retrieve(batchEntry.BatchId)
+                    batch = Batch.Retrieve(batchEntry.BatchId)
                         ?? throw new NopException("No response from the service");
                 }
 
@@ -1421,13 +1419,24 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (batch is not null)
                     parameters.Add(nameof(batch), batch);
 
-                var pickup = await Pickup.Create(parameters);
+                var pickup = Pickup.Create(parameters);
 
                 //log warning messages if any
                 if (_easyPostSettings.LogShipmentMessages && pickup.messages?.Any() == true)
                 {
-                    var warning = pickup.messages
-                        .Aggregate(string.Empty, (text, message) => $"{text}{message.carrier}: {message.message};{Environment.NewLine}");
+                    var warning = pickup.messages.Aggregate(string.Empty, (text, messageText) =>
+                    {
+                        try
+                        {
+                            //for some reason, sometimes we need to manually get message details
+                            var message = JsonConvert.DeserializeObject<Message>(messageText);
+                            if (message is not null)
+                                return $"{text}{message.carrier}: {message.message};{Environment.NewLine}";
+                        }
+                        catch { }
+
+                        return $"{text}{messageText};{Environment.NewLine}";
+                    });
                     await _logger.WarningAsync($"{EasyPostDefaults.SystemName} warning. {warning}");
                 }
 
@@ -1454,7 +1463,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
         /// </returns>
         public async Task<(Pickup Pickup, string Error)> GetPickupAsync(string pickupId)
         {
-            return await HandleFunctionAsync(async () =>
+            return await HandleFunctionAsync(() =>
             {
                 if (!IsConfigured())
                     throw new NopException("Plugin not configured");
@@ -1462,10 +1471,10 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(pickupId))
                     throw new NopException("Pickup id is not set");
 
-                var pickup = await Pickup.Retrieve(pickupId)
+                var pickup = Pickup.Retrieve(pickupId)
                     ?? throw new NopException("No response from the service");
 
-                return pickup;
+                return Task.FromResult(pickup);
             });
         }
 
@@ -1493,8 +1502,19 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 //log warning messages if any
                 if (_easyPostSettings.LogShipmentMessages && pickup.messages?.Any() == true)
                 {
-                    var warning = pickup.messages
-                        .Aggregate(string.Empty, (text, message) => $"{text}{message.carrier}: {message.message};{Environment.NewLine}");
+                    var warning = pickup.messages.Aggregate(string.Empty, (text, messageText) =>
+                    {
+                        try
+                        {
+                            //for some reason, sometimes we need to manually get message details
+                            var message = JsonConvert.DeserializeObject<Message>(messageText);
+                            if (message is not null)
+                                return $"{text}{message.carrier}: {message.message};{Environment.NewLine}";
+                        }
+                        catch { }
+
+                        return $"{text}{messageText};{Environment.NewLine}";
+                    });
                     await _logger.WarningAsync($"{EasyPostDefaults.SystemName} warning. {warning}");
                 }
 
@@ -1541,7 +1561,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(pickupId))
                     throw new NopException("Pickup id is not set");
 
-                var pickup = await Pickup.Retrieve(pickupId)
+                var pickup = Pickup.Retrieve(pickupId)
                     ?? throw new NopException("No response from the service");
 
                 //whether the pickup has already been purchased and scheduled
@@ -1552,7 +1572,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 var selectedRate = pickup.pickup_rates?.FirstOrDefault(rate => rate.id == rateId)
                     ?? throw new NopException($"Selected rate is not available");
 
-                await pickup.Buy(selectedRate.carrier, selectedRate.service);
+                pickup.Buy(selectedRate.carrier, selectedRate.service);
 
                 return true;
             });
@@ -1580,7 +1600,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if (string.IsNullOrEmpty(pickupId))
                     throw new NopException("Pickup id is not set");
 
-                var pickup = await Pickup.Retrieve(pickupId)
+                var pickup = Pickup.Retrieve(pickupId)
                     ?? throw new NopException("No response from the service");
 
                 //cancel the pickup and clear the pickup id
@@ -1591,8 +1611,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                     batchEntry.PickupId = string.Empty;
                     await UpdateBatchAsync(batchEntry);
                 }
-
-                await pickup.Cancel();
+                pickup.Cancel();
 
                 return true;
             });
@@ -1759,7 +1778,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 {
                     //create new batch
                     var reference = Guid.NewGuid();
-                    batch = await Batch.Create(new() { [nameof(reference)] = reference.ToString().ToLower() });
+                    batch = Batch.Create(new() { [nameof(reference)] = reference.ToString().ToLower() });
 
                     batchEntry.BatchGuid = reference;
                     batchEntry.BatchId = batch.id;
@@ -1768,7 +1787,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 else
                 {
                     //or get the existing one
-                    batch = await Batch.Retrieve(batchEntry.BatchId)
+                    batch = Batch.Retrieve(batchEntry.BatchId)
                         ?? throw new NopException("No response from the service");
                 }
 
@@ -1777,9 +1796,9 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 var idsToAdd = currentShipmentIds.Where(pair => !batchShipmentIds.Contains(pair.ShipmentId)).ToList();
                 var idsToRemove = batchShipmentIds.Where(id => !currentShipmentIds.Any(pair => id == pair.ShipmentId)).ToList();
                 if (idsToAdd.Any())
-                    await batch.AddShipments(idsToAdd.Select(pair => pair.ShipmentId));
+                    batch.AddShipments(idsToAdd.Select(pair => pair.ShipmentId));
                 if (idsToRemove.Any())
-                    await batch.RemoveShipments(idsToRemove);
+                    batch.RemoveShipments(idsToRemove);
 
                 batchEntry.StatusId = (int)GetBatchStatus(batch);
                 batchEntry.UpdatedOnUtc = DateTime.UtcNow;
@@ -1852,10 +1871,10 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if ((BatchStatus)batchEntry.StatusId != BatchStatus.Purchased)
                     throw new NopException("Batch is not yet purchased");
 
-                var batch = await Batch.Retrieve(batchEntry.BatchId)
+                var batch = Batch.Retrieve(batchEntry.BatchId)
                     ?? throw new NopException("No response from the service");
 
-                await batch.GenerateLabel((labelFormat ?? "pdf").ToUpper());
+                batch.GenerateLabel((labelFormat ?? "pdf").ToUpper());
                 batchEntry.LabelFormat = labelFormat;
                 await UpdateBatchAsync(batchEntry);
 
@@ -1873,7 +1892,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
         /// </returns>
         public async Task<((string Url, string ContentType), string Error)> DownloadBatchLabelAsync(EasyPostBatch batchEntry)
         {
-            return await HandleFunctionAsync(async () =>
+            return await HandleFunctionAsync(() =>
             {
                 if (batchEntry is null)
                     throw new ArgumentNullException(nameof(batchEntry));
@@ -1884,7 +1903,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                 if ((BatchStatus)batchEntry.StatusId != BatchStatus.LabelGenerated)
                     throw new NopException("Batch label is not yet generated");
 
-                var batch = await Batch.Retrieve(batchEntry.BatchId)
+                var batch = Batch.Retrieve(batchEntry.BatchId)
                     ?? throw new NopException("No response from the service");
 
                 if (string.IsNullOrEmpty(batch.label_url))
@@ -1896,7 +1915,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                     _ => MimeTypes.ApplicationPdf
                 };
 
-                return (batch.label_url, fileType);
+                return Task.FromResult((batch.label_url, fileType));
             });
         }
 
@@ -1910,7 +1929,7 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
         /// </returns>
         public async Task<(bool Result, string Error)> GenerateBatchManifestAsync(EasyPostBatch batchEntry)
         {
-            return await HandleFunctionAsync(async () =>
+            return await HandleFunctionAsync(() =>
             {
                 if (batchEntry is null)
                     throw new ArgumentNullException(nameof(batchEntry));
@@ -1925,12 +1944,12 @@ namespace Nop.Plugin.Shipping.EasyPost.Services
                     throw new NopException("Batch is not yet created");
                 }
 
-                var batch = await Batch.Retrieve(batchEntry.BatchId)
+                var batch = Batch.Retrieve(batchEntry.BatchId)
                     ?? throw new NopException("No response from the service");
 
-                await batch.GenerateScanForm();
+                batch.GenerateScanForm();
 
-                return true;
+                return Task.FromResult(true);
             });
         }
 

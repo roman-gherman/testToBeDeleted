@@ -76,16 +76,9 @@
                                     Width = "200",
                                     Visible = (await storeService.GetAllStoresAsync()).Count > 1
                                 },
-                                new ColumnProperty(nameof(FacebookPixelModel.PixelScriptEnabled))
+                                new ColumnProperty(nameof(FacebookPixelModel.Enabled))
                                 {
-                                    Title = T("Plugins.Widgets.FacebookPixel.Configuration.Fields.PixelScriptEnabled").Text,
-                                    Width = "100",
-                                    ClassName = NopColumnClassDefaults.CenterAll,
-                                    Render = new RenderBoolean()
-                                },
-                                new ColumnProperty(nameof(FacebookPixelModel.ConversionsApiEnabled))
-                                {
-                                    Title = T("Plugins.Widgets.FacebookPixel.Configuration.Fields.ConversionsApiEnabled").Text,
+                                    Title = T("Plugins.Widgets.FacebookPixel.Configuration.Fields.Enabled").Text,
                                     Width = "100",
                                     ClassName = NopColumnClassDefaults.CenterAll,
                                     Render = new RenderBoolean()

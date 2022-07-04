@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nop.Core.Infrastructure;
 using Nop.Plugin.Widgets.FacebookPixel.Services;
-using Nop.Web.Framework.Infrastructure.Extensions;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Infrastructure
 {
@@ -20,9 +19,6 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Infrastructure
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<FacebookPixelService>();
-
-            //client to request facebook conversions api
-            services.AddHttpClient<FacebookConversionsHttpClient>().WithProxy();
         }
 
         /// <summary>

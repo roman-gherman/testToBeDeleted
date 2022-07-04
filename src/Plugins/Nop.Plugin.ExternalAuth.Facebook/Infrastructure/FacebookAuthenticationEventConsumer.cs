@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Nop.Core.Domain.Customers;
 using Nop.Services.Authentication.External;
-using Nop.Services.Customers;
+using Nop.Services.Common;
 using Nop.Services.Events;
 
 namespace Nop.Plugin.ExternalAuth.Facebook.Infrastructure
@@ -14,15 +15,15 @@ namespace Nop.Plugin.ExternalAuth.Facebook.Infrastructure
     {
         #region Fields
 
-        private readonly ICustomerService _customerService;
+        private readonly IGenericAttributeService _genericAttributeService;
 
         #endregion
 
         #region Ctor
 
-        public FacebookAuthenticationEventConsumer(ICustomerService customerService)
+        public FacebookAuthenticationEventConsumer(IGenericAttributeService genericAttributeService)
         {
-            _customerService = customerService;
+            _genericAttributeService = genericAttributeService;
         }
 
         #endregion
@@ -43,17 +44,14 @@ namespace Nop.Plugin.ExternalAuth.Facebook.Infrastructure
             if (!eventMessage.AuthenticationParameters.ProviderSystemName.Equals(FacebookAuthenticationDefaults.SystemName))
                 return;
 
-            var customer = eventMessage.Customer;
             //store some of the customer fields
             var firstName = eventMessage.AuthenticationParameters.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.GivenName)?.Value;
             if (!string.IsNullOrEmpty(firstName))
-                customer.FirstName = firstName;
+                await _genericAttributeService.SaveAttributeAsync(eventMessage.Customer, NopCustomerDefaults.FirstNameAttribute, firstName);
 
             var lastName = eventMessage.AuthenticationParameters.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.Surname)?.Value;
             if (!string.IsNullOrEmpty(lastName))
-                customer.LastName = lastName;
-
-            await _customerService.UpdateCustomerAsync(customer);
+                await _genericAttributeService.SaveAttributeAsync(eventMessage.Customer, NopCustomerDefaults.LastNameAttribute, lastName);
         }
 
         #endregion

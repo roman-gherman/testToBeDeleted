@@ -11,6 +11,7 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Components
     /// <summary>
     /// Represents Facebook Pixel view component
     /// </summary>
+    [ViewComponent(Name = FacebookPixelDefaults.VIEW_COMPONENT)]
     public class FacebookPixelViewComponent : NopViewComponent
     {
         #region Fields

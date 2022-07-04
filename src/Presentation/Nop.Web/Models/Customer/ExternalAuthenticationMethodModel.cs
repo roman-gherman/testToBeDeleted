@@ -1,10 +1,9 @@
-﻿using System;
-using Nop.Web.Framework.Models;
+﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Customer
 {
     public partial record ExternalAuthenticationMethodModel : BaseNopModel
     {
-        public Type ViewComponent { get; set; }
+        public string ViewComponentName { get; set; }
     }
 }

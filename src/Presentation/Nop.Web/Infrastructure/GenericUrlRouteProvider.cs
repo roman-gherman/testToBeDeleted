@@ -35,68 +35,48 @@ namespace Nop.Web.Infrastructure
             if (!DataSettingsManager.IsDatabaseInstalled())
                 return;
 
-            //generic routes (actually routing is processed later in SlugRouteTransformer)
-            var genericCatalogPattern = $"{lang}/{{{NopRoutingDefaults.RouteValue.CatalogSeName}}}/{{{NopRoutingDefaults.RouteValue.SeName}}}";
-            endpointRouteBuilder.MapDynamicControllerRoute<SlugRouteTransformer>(genericCatalogPattern);
+            //generic routes
+            var genericPattern = $"{lang}/{{SeName}}";
 
-            var genericPattern = $"{lang}/{{{NopRoutingDefaults.RouteValue.SeName}}}";
             endpointRouteBuilder.MapDynamicControllerRoute<SlugRouteTransformer>(genericPattern);
 
-            //routes for not found slugs
-            if (!string.IsNullOrEmpty(lang))
-            {
-                endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.GenericUrlWithLanguageCode,
-                    pattern: genericPattern,
-                    defaults: new { controller = "Common", action = "GenericUrl" });
-
-                endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.GenericCatalogUrlWithLanguageCode,
-                    pattern: genericCatalogPattern,
-                    defaults: new { controller = "Common", action = "GenericUrl" });
-            }
-
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.GenericUrl,
-                pattern: $"{{{NopRoutingDefaults.RouteValue.SeName}}}",
+            endpointRouteBuilder.MapControllerRoute(name: "GenericUrl",
+                pattern: "{genericSeName}",
                 defaults: new { controller = "Common", action = "GenericUrl" });
 
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.GenericCatalogUrl,
-                pattern: $"{{{NopRoutingDefaults.RouteValue.CatalogSeName}}}/{{{NopRoutingDefaults.RouteValue.SeName}}}",
+            endpointRouteBuilder.MapControllerRoute(name: "GenericUrlWithParameter",
+                pattern: "{genericSeName}/{genericParameter}",
                 defaults: new { controller = "Common", action = "GenericUrl" });
 
-            //routes for entities that support catalog path and slug (e.g. '/category-seo-name/product-seo-name')
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.ProductCatalog,
-                pattern: genericCatalogPattern,
-                defaults: new { controller = "Product", action = "ProductDetails" });
-
-            //routes for entities that support single slug (e.g. '/product-seo-name')
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.Product,
+            endpointRouteBuilder.MapControllerRoute(name: "Product",
                 pattern: genericPattern,
                 defaults: new { controller = "Product", action = "ProductDetails" });
 
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.Category,
+            endpointRouteBuilder.MapControllerRoute(name: "Category",
                 pattern: genericPattern,
                 defaults: new { controller = "Catalog", action = "Category" });
 
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.Manufacturer,
+            endpointRouteBuilder.MapControllerRoute(name: "Manufacturer",
                 pattern: genericPattern,
                 defaults: new { controller = "Catalog", action = "Manufacturer" });
 
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.Vendor,
+            endpointRouteBuilder.MapControllerRoute(name: "Vendor",
                 pattern: genericPattern,
                 defaults: new { controller = "Catalog", action = "Vendor" });
 
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.NewsItem,
+            endpointRouteBuilder.MapControllerRoute(name: "NewsItem",
                 pattern: genericPattern,
                 defaults: new { controller = "News", action = "NewsItem" });
 
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.BlogPost,
+            endpointRouteBuilder.MapControllerRoute(name: "BlogPost",
                 pattern: genericPattern,
                 defaults: new { controller = "Blog", action = "BlogPost" });
 
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.Topic,
+            endpointRouteBuilder.MapControllerRoute(name: "Topic",
                 pattern: genericPattern,
                 defaults: new { controller = "Topic", action = "TopicDetails" });
 
-            endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.ProductTag,
+            endpointRouteBuilder.MapControllerRoute(name: "ProductsByTag",
                 pattern: genericPattern,
                 defaults: new { controller = "Catalog", action = "ProductsByTag" });
         }

@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
+using Nop.Core.Domain.Customers;
 using Nop.Core.Events;
 using Nop.Services.Catalog;
-using Nop.Services.Customers;
+using Nop.Services.Common;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
@@ -24,8 +25,8 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         private readonly CatalogSettings _catalogSettings;
         private readonly ICustomerActivityService _customerActivityService;
-        private readonly ICustomerService _customerService;
         private readonly IEventPublisher _eventPublisher;
+        private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILocalizationService _localizationService;
         private readonly INotificationService _notificationService;
         private readonly IPermissionService _permissionService;
@@ -40,8 +41,8 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         public ProductReviewController(CatalogSettings catalogSettings,
             ICustomerActivityService customerActivityService,
-            ICustomerService customerService,
             IEventPublisher eventPublisher,
+            IGenericAttributeService genericAttributeService,
             ILocalizationService localizationService,
             INotificationService notificationService,
             IPermissionService permissionService,
@@ -52,8 +53,8 @@ namespace Nop.Web.Areas.Admin.Controllers
         {
             _catalogSettings = catalogSettings;
             _customerActivityService = customerActivityService;
-            _customerService = customerService;
             _eventPublisher = eventPublisher;
+            _genericAttributeService = genericAttributeService;
             _localizationService = localizationService;
             _notificationService = notificationService;
             _permissionService = permissionService;
@@ -151,8 +152,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 if (productReview.IsApproved && !string.IsNullOrEmpty(productReview.ReplyText)
                     && _catalogSettings.NotifyCustomerAboutProductReviewReply && !productReview.CustomerNotifiedOfReply)
                 {
-                    var customer = await _customerService.GetCustomerByIdAsync(productReview.CustomerId);
-                    var customerLanguageId = customer?.LanguageId ?? 0;
+                    var customerLanguageId = await _genericAttributeService.GetAttributeAsync<Customer, int>(productReview.CustomerId,
+                        NopCustomerDefaults.LanguageIdAttribute, productReview.StoreId);
 
                     var queuedEmailIds = await _workflowMessageService.SendProductReviewReplyCustomerNotificationMessageAsync(productReview, customerLanguageId);
                     if (queuedEmailIds.Any())

@@ -328,8 +328,8 @@ namespace Nop.Web.Framework
         {
             //save passed language identifier
             var customer = await GetCurrentCustomerAsync();
-            customer.LanguageId = language?.Id;
-            await _customerService.UpdateCustomerAsync(customer);
+            var store = await _storeContext.GetCurrentStoreAsync();
+            await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.LanguageIdAttribute, language?.Id ?? 0, store.Id);
 
             //set cookie
             SetLanguageCookie(language);
@@ -355,7 +355,8 @@ namespace Nop.Web.Framework
             var detectedLanguage = await GetLanguageFromRequestAsync();
 
             //get current saved language identifier
-            var currentLanguageId = customer.LanguageId;
+            var currentLanguageId = await _genericAttributeService
+                .GetAttributeAsync<int>(customer, NopCustomerDefaults.LanguageIdAttribute, store.Id);
 
             //if the language is detected we need to save it
             if (detectedLanguage != null)
@@ -415,18 +416,14 @@ namespace Nop.Web.Framework
             var customer = await GetCurrentCustomerAsync();
             var store = await _storeContext.GetCurrentStoreAsync();
 
-            if (customer.IsSearchEngineAccount())
-            {
-                _cachedCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId)
-                    ?? (await _currencyService.GetAllCurrenciesAsync(storeId: store.Id)).FirstOrDefault();
-
-                return _cachedCurrency;
-            }
+            //find a currency previously selected by a customer
+            var customerCurrencyId = await _genericAttributeService
+                .GetAttributeAsync<int>(customer, NopCustomerDefaults.CurrencyIdAttribute, store.Id);
 
             var allStoreCurrencies = await _currencyService.GetAllCurrenciesAsync(storeId: store.Id);
 
             //check customer currency availability
-            var customerCurrency = allStoreCurrencies.FirstOrDefault(currency => currency.Id == customer.CurrencyId);
+            var customerCurrency = allStoreCurrencies.FirstOrDefault(currency => currency.Id == customerCurrencyId);
             if (customerCurrency == null)
             {
                 //it not found, then try to get the default currency for the current language (if specified)
@@ -458,11 +455,8 @@ namespace Nop.Web.Framework
         {
             //save passed currency identifier
             var customer = await GetCurrentCustomerAsync();
-            if (customer.IsSearchEngineAccount())
-                return;
-
-            customer.CurrencyId = currency?.Id;
-            await _customerService.UpdateCustomerAsync(customer);
+            var store = await _storeContext.GetCurrentStoreAsync();
+            await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CurrencyIdAttribute, currency?.Id ?? 0, store.Id);
 
             //then reset the cached value
             _cachedCurrency = null;
@@ -480,12 +474,14 @@ namespace Nop.Web.Framework
 
             var taxDisplayType = TaxDisplayType.IncludingTax;
             var customer = await GetCurrentCustomerAsync();
+            var store = await _storeContext.GetCurrentStoreAsync();
 
             //whether customers are allowed to select tax display type
             if (_taxSettings.AllowCustomersToSelectTaxDisplayType && customer != null)
             {
                 //try to get previously saved tax display type
-                var taxDisplayTypeId = customer.TaxDisplayTypeId;
+                var taxDisplayTypeId = await _genericAttributeService
+                    .GetAttributeAsync<int?>(customer, NopCustomerDefaults.TaxDisplayTypeIdAttribute, store.Id);
                 if (taxDisplayTypeId.HasValue)
                     taxDisplayType = (TaxDisplayType)taxDisplayTypeId.Value;
                 else
@@ -524,8 +520,9 @@ namespace Nop.Web.Framework
 
             //save passed value
             var customer = await GetCurrentCustomerAsync();
-            customer.TaxDisplayType = taxDisplayType;
-            await _customerService.UpdateCustomerAsync(customer);
+            var store = await _storeContext.GetCurrentStoreAsync();
+            await _genericAttributeService
+                .SaveAttributeAsync(customer, NopCustomerDefaults.TaxDisplayTypeIdAttribute, (int)taxDisplayType, store.Id);
 
             //then reset the cached value
             _cachedTaxDisplayType = null;

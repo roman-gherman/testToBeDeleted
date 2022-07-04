@@ -138,7 +138,7 @@ namespace Nop.Web.Factories
             {
                 locationEnabled = true;
 
-                var countryId = customer.CountryId;
+                var countryId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.CountryIdAttribute);
                 var country = await _countryService.GetCountryByIdAsync(countryId);
                 if (country != null)
                 {
@@ -177,10 +177,11 @@ namespace Nop.Web.Factories
             var dateOfBirth = string.Empty;
             if (_customerSettings.DateOfBirthEnabled)
             {
-                if (customer.DateOfBirth.HasValue)
+                var dob = await _genericAttributeService.GetAttributeAsync<DateTime?>(customer, NopCustomerDefaults.DateOfBirthAttribute);
+                if (dob.HasValue)
                 {
                     dateOfBirthEnabled = true;
-                    dateOfBirth = customer.DateOfBirth.Value.ToString("D");
+                    dateOfBirth = dob.Value.ToString("D");
                 }
             }
 
@@ -261,7 +262,7 @@ namespace Nop.Web.Factories
                 ShowTotalSummary = false,
                 RouteActionName = "CustomerProfilePaged",
                 UseRouteLinks = true,
-                RouteValues = new RouteValues { PageNumber = page, Id = customer.Id }
+                RouteValues = new RouteValues { pageNumber = page, id = customer.Id }
             };
 
             var model = new ProfilePostsModel

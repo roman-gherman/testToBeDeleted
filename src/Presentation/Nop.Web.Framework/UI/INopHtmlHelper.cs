@@ -72,7 +72,8 @@ namespace Nop.Web.Framework.UI
         /// <param name="src">Script path (minified version)</param>
         /// <param name="debugSrc">Script path (full debug version). If empty, then minified version will be used</param>
         /// <param name="excludeFromBundle">A value indicating whether to exclude this script from bundling</param>
-        void AddScriptParts(ResourceLocation location, string src, string debugSrc = "", bool excludeFromBundle = false);
+        /// <param name="isAsync">A value indicating whether to add an attribute "async" or not for js files</param>
+        void AddScriptParts(ResourceLocation location, string src, string debugSrc = "", bool excludeFromBundle = false, bool isAsync = false);
 
         /// <summary>
         /// Append script element
@@ -81,7 +82,8 @@ namespace Nop.Web.Framework.UI
         /// <param name="src">Script path (minified version)</param>
         /// <param name="debugSrc">Script path (full debug version). If empty, then minified version will be used</param>
         /// <param name="excludeFromBundle">A value indicating whether to exclude this script from bundling</param>
-        void AppendScriptParts(ResourceLocation location, string src, string debugSrc = "", bool excludeFromBundle = false);
+        /// <param name="isAsync">A value indicating whether to add an attribute "async" or not for js files</param>
+        void AppendScriptParts(ResourceLocation location, string src, string debugSrc = "", bool excludeFromBundle = false, bool isAsync = false);
 
         /// <summary>
         /// Generate all script parts

@@ -19,11 +19,9 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         public ProductModel()
         {
             ProductPictureModels = new List<ProductPictureModel>();
-            ProductVideoModels = new List<ProductVideoModel>();
             Locales = new List<ProductLocalizedModel>();
             CopyProductModel = new CopyProductModel();
             AddPictureModel = new ProductPictureModel();
-            AddVideoModel = new ProductVideoModel();
             ProductWarehouseInventoryModels = new List<ProductWarehouseInventoryModel>();
             ProductEditorSettingsModel = new ProductEditorSettingsModel();
             StockQuantityHistory = new StockQuantityHistoryModel();
@@ -58,7 +56,6 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
             CrossSellProductSearchModel = new CrossSellProductSearchModel();
             AssociatedProductSearchModel = new AssociatedProductSearchModel();
             ProductPictureSearchModel = new ProductPictureSearchModel();
-            ProductVideoSearchModel = new ProductVideoSearchModel();
             ProductSpecificationAttributeSearchModel = new ProductSpecificationAttributeSearchModel();
             ProductOrderSearchModel = new ProductOrderSearchModel();
             TierPriceSearchModel = new TierPriceSearchModel();
@@ -431,10 +428,6 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         public ProductPictureModel AddPictureModel { get; set; }
         public IList<ProductPictureModel> ProductPictureModels { get; set; }
 
-        //videos
-        public ProductVideoModel AddVideoModel { get; set; }
-        public IList<ProductVideoModel> ProductVideoModels { get; set; }
-
         //product attributes
         public bool ProductAttributesExist { get; set; }
         public bool CanCreateCombinations { get; set; }
@@ -462,8 +455,6 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         public AssociatedProductSearchModel AssociatedProductSearchModel { get; set; }
 
         public ProductPictureSearchModel ProductPictureSearchModel { get; set; }
-
-        public ProductVideoSearchModel ProductVideoSearchModel { get; set; }
 
         public ProductSpecificationAttributeSearchModel ProductSpecificationAttributeSearchModel { get; set; }
 

@@ -11,6 +11,7 @@ using Nop.Web.Framework.Components;
 
 namespace Nop.Plugin.Widgets.NivoSlider.Components
 {
+    [ViewComponent(Name = "WidgetsNivoSlider")]
     public class WidgetsNivoSliderViewComponent : NopViewComponent
     {
         private readonly IStoreContext _storeContext;

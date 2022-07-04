@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Nop.Services.Plugins;
 
 namespace Nop.Services.Authentication.MultiFactor
@@ -17,16 +16,16 @@ namespace Nop.Services.Authentication.MultiFactor
         MultiFactorAuthenticationType Type { get; }
 
         /// <summary>
-        /// Gets a type of a view component for displaying plugin in public store
+        /// Gets a name of a view component for displaying plugin in public store
         /// </summary>
-        /// <returns>View component type</returns>
-        Type GetPublicViewComponent();
+        /// <returns>View component name</returns>
+        string GetPublicViewComponentName();
 
         /// <summary>
-        /// Gets a type of a view component for displaying verification page
+        /// Gets a name of a view component for displaying verification page
         /// </summary>
-        /// <returns>View component type</returns>
-        Type GetVerificationViewComponent();
+        /// <returns>View component name</returns>
+        string GetVerificationViewComponentName();
 
         /// <summary>
         /// Gets a multi-factor authentication method description that will be displayed on customer info pages in the public store

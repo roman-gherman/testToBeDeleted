@@ -14,7 +14,6 @@ namespace Nop.Tests.Nop.Services.Tests.Helpers
     [TestFixture]
     public class DateTimeHelperTests : ServiceTest
     {
-        private ICustomerService _customerService;
         private IGenericAttributeService _genericAttributeService;
         private DateTimeSettings _dateTimeSettings;
         private IDateTimeHelper _dateTimeHelper;
@@ -43,7 +42,6 @@ namespace Nop.Tests.Nop.Services.Tests.Helpers
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            _customerService = GetService<ICustomerService>();
             _genericAttributeService = GetService<IGenericAttributeService>();
             _dateTimeSettings = GetService<DateTimeSettings>();
             _dateTimeHelper = GetService<IDateTimeHelper>();
@@ -51,7 +49,7 @@ namespace Nop.Tests.Nop.Services.Tests.Helpers
 
             _customer = await GetService<ICustomerService>().GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail);
 
-            _defaultTimeZone =_customer.TimeZoneId;
+            _defaultTimeZone = await _genericAttributeService.GetAttributeAsync<string>(_customer, NopCustomerDefaults.TimeZoneIdAttribute);
 
             _defaultAllowCustomersToSetTimeZone = _dateTimeSettings.AllowCustomersToSetTimeZone;
             _defaultDefaultStoreTimeZoneId = _dateTimeSettings.DefaultStoreTimeZoneId;
@@ -71,7 +69,8 @@ namespace Nop.Tests.Nop.Services.Tests.Helpers
         [OneTimeTearDown]
         public async Task TearDown()
         {
-            _customer.TimeZoneId = _defaultTimeZone;
+            await _genericAttributeService.SaveAttributeAsync(_customer, NopCustomerDefaults.TimeZoneIdAttribute, _defaultTimeZone);
+
             _dateTimeSettings.AllowCustomersToSetTimeZone = _defaultAllowCustomersToSetTimeZone;
             _dateTimeSettings.DefaultStoreTimeZoneId = _defaultDefaultStoreTimeZoneId;
 
@@ -93,8 +92,7 @@ namespace Nop.Tests.Nop.Services.Tests.Helpers
             _dateTimeSettings.DefaultStoreTimeZoneId = _gmtPlus2MinskTimeZoneId; //(GMT+02:00) Minsk;
             await _settingService.SaveSettingAsync(_dateTimeSettings);
 
-            _customer.TimeZoneId = _gmtPlus3MoscowTimeZoneId;
-            await _customerService.UpdateCustomerAsync(_customer);
+            await _genericAttributeService.SaveAttributeAsync(_customer, NopCustomerDefaults.TimeZoneIdAttribute, _gmtPlus3MoscowTimeZoneId);
 
             var timeZone = await GetService<IDateTimeHelper>().GetCustomerTimeZoneAsync(_customer);
             timeZone.Should().NotBeNull();
@@ -108,8 +106,7 @@ namespace Nop.Tests.Nop.Services.Tests.Helpers
             _dateTimeSettings.DefaultStoreTimeZoneId = _gmtPlus2MinskTimeZoneId; //(GMT+02:00) Minsk;
             await _settingService.SaveSettingAsync(_dateTimeSettings);
 
-            _customer.TimeZoneId = _gmtPlus3MoscowTimeZoneId;
-            await _customerService.UpdateCustomerAsync(_customer);
+            await _genericAttributeService.SaveAttributeAsync(_customer, NopCustomerDefaults.TimeZoneIdAttribute, _gmtPlus3MoscowTimeZoneId);
             
             var timeZone = await GetService<IDateTimeHelper>().GetCustomerTimeZoneAsync(_customer);
             timeZone.Should().NotBeNull();

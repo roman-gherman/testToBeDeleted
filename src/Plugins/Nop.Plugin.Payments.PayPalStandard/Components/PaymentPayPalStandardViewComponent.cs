@@ -3,6 +3,7 @@ using Nop.Web.Framework.Components;
 
 namespace Nop.Plugin.Payments.PayPalStandard.Components
 {
+    [ViewComponent(Name = "PaymentPayPalStandard")]
     public class PaymentPayPalStandardViewComponent : NopViewComponent
     {
         public IViewComponentResult Invoke()

@@ -4,11 +4,11 @@
     Layout = "_ConfigurePlugin";
 }
 
-@await Component.InvokeAsync(typeof(StoreScopeConfigurationViewComponent))
+@await Component.InvokeAsync("StoreScopeConfiguration")
 
 @if (Model.IsConfigured)
 {
-    @await Component.InvokeAsync(typeof(SettingModeViewComponent))
+    @await Component.InvokeAsync("SettingMode")
 }
 
 <script>

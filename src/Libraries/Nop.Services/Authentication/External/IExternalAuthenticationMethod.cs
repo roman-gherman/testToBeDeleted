@@ -1,4 +1,3 @@
-﻿using System;
 using Nop.Services.Plugins;
 
 namespace Nop.Services.Authentication.External
@@ -9,9 +8,9 @@ namespace Nop.Services.Authentication.External
     public partial interface IExternalAuthenticationMethod : IPlugin
     {
         /// <summary>
-        /// Gets a type of a view component for displaying plugin in public store
+        /// Gets a name of a view component for displaying plugin in public store
         /// </summary>
-        /// <returns>View component type</returns>
-        Type GetPublicViewComponent();
+        /// <returns>View component name</returns>
+        string GetPublicViewComponentName();
     }
 }
